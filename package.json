@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Playlist Editor for google play music",
   "main": "src/main.js",
-  "author": "florian bramer <flo@familie-bramer.de>",
+  "author": "florian bramer <elektronenhirn@gmail.com>",
   "license": "BSD3",
   "bin": "src/main.js", 
   "scripts": {
