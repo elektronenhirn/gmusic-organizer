@@ -1,0 +1,30 @@
+{
+  "box": {
+    "border": {
+      "fg": "white"
+    },
+    "item": {
+      "hover": {
+        "bg": "green"
+      }
+    },
+    "selected": {
+      "bg": "blue",
+      "bold": "true"
+    },
+    "focus": {
+      "border": {
+        "fg": "cyan"
+      }
+    }
+  },
+  "title": {
+    "focused": "{cyan-fg} ${title} {/cyan-fg}",
+    "unfocused": "{white-fg} ${title} {/white-fg}"
+  },
+  "track": "{bold}{white-fg}${artist}{/white-fg}{/bold} {gray-fg}${title}{/gray-fg}",
+  "playlist": "{bold}{white-fg}${playlist}{/white-fg}{/bold}",
+  "outputView": {
+    "height": 6
+  }
+}
