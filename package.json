@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "author": "florian bramer <flo@familie-bramer.de>",
   "license": "BSD3",
+  "bin": "src/main.js", 
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
