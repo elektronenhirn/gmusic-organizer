@@ -1,5 +1,5 @@
 'use strict';
-const settings = require('user-settings').file('.gmusic-editor');
+const settings = require('user-settings').file('.gmusic-organizer');
 const TextInputView = require('../view/TextInputView.js');
 
 class Credentials{

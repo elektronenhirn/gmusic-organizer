@@ -53,7 +53,7 @@ function tryToLogin(){
     });
   } else {
     credentials.askUserForLogin(screen, style).then(()=>{
-      logger.info('requesting master token for gmusic-editor as ' + credentials.get().email);
+      logger.info('requesting master token for gmusic-organizer as ' + credentials.get().email);
       pm.login(credentials.get(), (err, result)=>{
         if (err){
           logger.error('requesting master token failed: ', err);
