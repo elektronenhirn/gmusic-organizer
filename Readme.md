@@ -39,6 +39,7 @@ General
  h             help (show this window) 
  F5            refresh
  q             quit
+ /             search for track in current view
 
 Built in player
 

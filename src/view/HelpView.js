@@ -9,6 +9,7 @@ const CONTENT =
 ' h             help (show this window)\n' + 
 ' F5            refresh\n' +
 ' q             quit\n' +
+' /             search for track in current view \n' +
 '\nBuilt in player\n\n' +
 ' p             play songs\n' + 
 ' s             stop playing\n' + 
@@ -23,14 +24,14 @@ const CONTENT =
 ' C-x           cut song to clipboard\n' + 
 ' C-v           paste song into playlist\n' +
 ' del/backspace remove song from playlist\n' +
-'{/white-fg}                                         '; 
+'{/white-fg}'; 
 
 class HelpView {
 
   constructor(screen, style){
     this._screen = screen;
     this._box = blessed.box({
-      top: 'center',
+      top: '50%-15',
       left: 'center',
       height: 'shrink',
       width: 'shrink',
