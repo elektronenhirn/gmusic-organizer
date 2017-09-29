@@ -2,6 +2,7 @@
 
 A node.js playlist organizer for google play music running in a terminal. Powered by [blessed](https://github.com/chjj/blessed) and [playmusic](https://github.com/jamon/playmusic).
 
+![Screenshot](screenshot.png)
 
 ## Installation
 
