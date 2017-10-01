@@ -1,7 +1,9 @@
 'use strict';
 var fs = require('fs');
+var path = require('path');
 
-const LOGFILE = 'log.txt';
+const dotFolder = require('./DotFolder.js');
+const LOGFILE = path.join(dotFolder.get(), 'log.txt');
 
 class Logger{
 

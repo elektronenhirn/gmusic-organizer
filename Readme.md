@@ -29,7 +29,7 @@ If the login step fails, you might need to:
 - create an [app specific password](https://support.google.com/accounts/answer/185833?hl=en) (usually required when two-factor authentication is enabled
 ) 
 
-After a successful authentication, a master token is created and stored in `~/.gmusic-organizer`.
+After a successful authentication, a master token is created and stored in `~/.gmusic-organizer/credentials`.
 
 Hit `h` to get a list of available controls.
 
@@ -60,3 +60,7 @@ Playlist manipulation
  C-v           paste song into playlist
  del/backspace remove song from playlist
 ```
+
+## Logging
+
+Each session creates a logfile at `~/.gmusic-organizer/log.txt`. Look into this file if you experience any problems.

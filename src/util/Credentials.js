@@ -1,10 +1,12 @@
 'use strict';
-const settings = require('user-settings').file('.gmusic-organizer');
+const settings = require('user-settings').file('.gmusic-organizer/credentials');
 const TextInputView = require('../view/TextInputView.js');
+const dotFolder = require('./DotFolder.js');
 
 class Credentials{
 
   constructor(){
+    dotFolder.prepare();
     this._credentials = settings.get('credentials') || 
       {
         email : undefined,
