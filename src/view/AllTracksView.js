@@ -4,8 +4,11 @@ var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
 const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
+const MessageView = require('./MessageView.js');
 const tagConfig = require('../util/TagConfig.js');
 const Filters = require('./Filters.js');
+const util = require('util');
+
 class AllTracksView{
 
   constructor(screen, style, player, playlistManager){
@@ -101,6 +104,7 @@ class AllTracksView{
     this._screen.key('C-c', this.copyToClipboard.bind(this));
     this._screen.key('f', this.filter.bind(this));
     this._screen.key('t', this.tagEntry.bind(this));
+    this._screen.key('i', this.showInfo.bind(this));
   }
 
   onUnFocused(){
@@ -109,6 +113,7 @@ class AllTracksView{
     this._screen.removeKeyAll('C-c');
     this._screen.removeKeyAll('f');
     this._screen.removeKeyAll('t');
+    this._screen.removeKeyAll('i');
   }
 
   copyToClipboard(){
@@ -125,7 +130,7 @@ class AllTracksView{
   }
 
   filter(){
-    let view = new MultiCheckboxInputView(this._screen, this._style);
+    let view = new MultiCheckboxInputView(this._screen, this._style, 'f');
     let availableTags = tagConfig.getTags();
     const UNTAGGED_OPTION = '[untagged]';
     availableTags.push(UNTAGGED_OPTION);
@@ -160,7 +165,7 @@ class AllTracksView{
     let availableTags = tagConfig.getTags();
     let usedTags = track.tagsAsString();
 
-    let view = new MultiCheckboxInputView(this._screen, this._style);
+    let view = new MultiCheckboxInputView(this._screen, this._style, 't');
     view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
       addedElements.forEach((tagName)=>{
         this._playlistManager.addTrackToTag(track, tagName);
@@ -171,6 +176,15 @@ class AllTracksView{
     });
   }
 
+  showInfo(){
+    let track = this._selectedTrack();
+    if (!track){
+      return; //nothing selected
+    }
+
+    let view = new MessageView(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
+    view.show();
+  }
 
   _selectedTrack(){
     return this._filteredTrackList[this._list.selected];
