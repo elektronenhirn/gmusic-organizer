@@ -4,9 +4,10 @@ var blessed = require('blessed');
 
 class MultiCheckboxInputView{
 
-  constructor(screen, style){
+  constructor(screen, style, confirmKey){
     this._screen = screen;
     this._style = style;
+    this._confirmKey = confirmKey || '';
     this._callback = undefined;
     this._elements = undefined;
     this._initalSelection = undefined;
@@ -94,10 +95,12 @@ class MultiCheckboxInputView{
 
   onFocused(){
     this._screen.key('space', this.select.bind(this));
+    this._screen.key(this._confirmKey, this.onDone.bind(this));
   }
 
   onUnFocused(){
     this._screen.removeKeyAll('space');
+    this._screen.removeKeyAll(this._confirmKey);
   }
 
   select(){

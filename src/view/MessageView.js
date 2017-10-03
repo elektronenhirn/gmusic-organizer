@@ -4,8 +4,9 @@ var blessed = require('blessed');
 
 class MessageView {
 
-  constructor(screen, style, title, content){
+  constructor(screen, style, confirmKey, title, content){
     this._screen = screen;
+    this._confirmKey = confirmKey || '';
     this._box = blessed.box({
       top: '50%-15',
       left: 'center',
@@ -33,11 +34,13 @@ class MessageView {
   onFocused(){
     this._screen.key('enter', this.hide.bind(this));
     this._screen.key('esc', this.hide.bind(this));
+    this._screen.key(this._confirmKey, this.hide.bind(this));
   }
 
   onUnFocused(){
     this._screen.removeKeyAll('enter');
     this._screen.removeKeyAll('esc');
+    this._screen.removeKeyAll(this._confirmKey);
   }
 
   hide(){

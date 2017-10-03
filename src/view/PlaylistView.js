@@ -181,7 +181,7 @@ class PlaylistView{
     let availableTags = tagConfig.getTags();
     let usedTags = entry.getTrack().tagsAsString();
 
-    let view = new MultiCheckboxInputView(this._screen, this._style);
+    let view = new MultiCheckboxInputView(this._screen, this._style, 't');
     view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
       let track = entry.getTrack();
       addedElements.forEach((tagName)=>{
@@ -200,7 +200,7 @@ class PlaylistView{
     }
 
     let track = entry.getTrack();
-    let view = new MessageView(this._screen, this._style, 'Info: ' + track.getName(), util.inspect(track._track));
+    let view = new MessageView(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
     view.show();
   }
 
