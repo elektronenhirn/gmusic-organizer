@@ -25,6 +25,7 @@
   "track": "{bold}{white-fg}${artist}{/white-fg}{/bold} {gray-fg}${title}{/gray-fg}",
   "playlist": "{bold}{white-fg}${playlist}{/white-fg}{/bold}",
   "checkbox": "{bold}{white-fg}[${checkbox}]{/white-fg}{/bold} {gray-fg}${label}{/gray-fg}",
+  "message": "{white-fg}${message}{/white-fg}",
   "outputView": {
     "height": 6
   }

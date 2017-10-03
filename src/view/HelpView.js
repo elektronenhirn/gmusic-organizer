@@ -4,7 +4,6 @@ var blessed = require('blessed');
 
 const CONTENT =
 '{white-fg}' + 
-'{bold}Help - available controls:{/bold}\n' +
 '\nGeneral\n\n' +
 ' h             help (show this window)\n' + 
 ' F5            refresh\n' +
@@ -12,6 +11,7 @@ const CONTENT =
 ' /             search for track in current view \n' +
 ' t             tag a tracks \n' +
 ' f             filter all tracks \n' +
+' i             show track info\n' +
 '\nBuilt in player\n\n' +
 ' p             play songs\n' + 
 ' s             stop playing\n' + 
@@ -30,7 +30,6 @@ const CONTENT =
 
 class HelpView {
 
-
   constructor(screen, style){
     this._screen = screen;
     this._box = blessed.box({
@@ -38,6 +37,7 @@ class HelpView {
       left: 'center',
       height: 'shrink',
       width: 'shrink',
+      label: '{white-fg}{bold}Help - available controls:{/bold}{/white-fg}',
       content: CONTENT,
       tags: true,
       border: {
@@ -61,7 +61,7 @@ class HelpView {
     this._screen.render();
   }
 
-  hide(){    
+  hide(){
     this._screen.remove(this._box);
     this._screen.render();
   }

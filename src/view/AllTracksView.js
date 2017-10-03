@@ -113,6 +113,10 @@ class AllTracksView{
 
   copyToClipboard(){
     let track = this._selectedTrack();
+    if (!track){
+      return; //nothing selected
+    }
+
     logger.verbose('copy ' + track.getName());
 
     clipboard.set(track, (clipboard, playlist, selectedPlaylistEntry)=>{
@@ -149,6 +153,10 @@ class AllTracksView{
 
   tagEntry(){
     let track = this._selectedTrack();
+    if (!track){
+      return; //nothing selected
+    }
+
     let availableTags = tagConfig.getTags();
     let usedTags = track.tagsAsString();
 

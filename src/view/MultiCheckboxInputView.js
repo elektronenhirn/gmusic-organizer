@@ -123,7 +123,8 @@ class MultiCheckboxInputView{
     }
 
     this._callback(addedElements, removedElements, selectedElements);
-    this._list.hide();
+    this._screen.remove(this._list);
+    this._screen.render();
   }
 
 }

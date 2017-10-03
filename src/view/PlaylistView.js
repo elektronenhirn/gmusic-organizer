@@ -4,7 +4,9 @@ var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
 const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
+const MessageView = require('./MessageView.js');
 const tagConfig = require('../util/TagConfig.js');
+const util = require('util');
 
 class PlaylistView{
 
@@ -114,6 +116,7 @@ class PlaylistView{
     this._screen.key('del', this.deleteEntry.bind(this));
     this._screen.key('backspace', this.deleteEntry.bind(this));
     this._screen.key('t', this.tagEntry.bind(this));
+    this._screen.key('i', this.showInfo.bind(this));
   }
 
   onUnFocused(){
@@ -125,10 +128,15 @@ class PlaylistView{
     this._screen.removeKeyAll('del');
     this._screen.removeKeyAll('backspace');
     this._screen.removeKeyAll('t');
+    this._screen.removeKeyAll('i');
   }
 
   copyToClipboard(){
     let entry = this._selectedEntry();
+    if (!entry){
+      return; //nothing selected
+    }
+
     logger.verbose('copy ' + entry.getName());
 
     clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry)=>{
@@ -138,6 +146,10 @@ class PlaylistView{
 
   cutToClipboard(){
     let entry = this._selectedEntry();
+    if (!entry){
+      return; //nothing selected
+    }
+
     logger.verbose('cut ' + entry.getName());
 
     clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry)=>{
@@ -153,11 +165,19 @@ class PlaylistView{
 
   deleteEntry(){
     let entry = this._selectedEntry();
+    if (!entry){
+      return; //nothing selected
+    }
+
     this._playlist.removeEntry(entry);
   }
 
   tagEntry(){
     let entry = this._selectedEntry();
+    if (!entry){
+      return; //nothing selected
+    }
+
     let availableTags = tagConfig.getTags();
     let usedTags = entry.getTrack().tagsAsString();
 
@@ -171,6 +191,17 @@ class PlaylistView{
         this._playlistManager.removeTrackFromTag(track, tagName);
       });
     });
+  }
+
+  showInfo(){
+    let entry = this._selectedEntry();
+    if (!entry){
+      return; //nothing selected
+    }
+
+    let track = entry.getTrack();
+    let view = new MessageView(this._screen, this._style, 'Info: ' + track.getName(), util.inspect(track._track));
+    view.show();
   }
 
   _selectedTrack(){
