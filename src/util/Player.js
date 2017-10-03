@@ -55,12 +55,12 @@ class Player{
   }
 
   _playTrackNr(idx){
-    if (!this._trackList || idx >= this._trackList.getTracks()){
+    if (!this._trackList || idx >= this._trackList.length){
       logger.info('no more tracks left to play');
       return;
     }
 
-    let track = this._trackList.getTracks()[idx];
+    let track = this._trackList[idx];
 
     this._getStreamUrl(track)
       .then((url)=>{

@@ -20,6 +20,10 @@ class Playlist {
     return this._entries[idx];
   }
 
+  getEntryByTrack(track){
+    return this._entries.find((entry) => entry.getTrack() === track);
+  }
+
   getLength(){
     return this._entries.length;
   }
@@ -51,6 +55,10 @@ class Playlist {
 
   removeEntry(entry){
     this._playlistManager.removeEntryFromPlaylist(this, entry);
+  }
+
+  containsTrack(track){
+    return this._entries.find((entry)=>entry.getTrack() === track);
   }
 
   _getEntryAfter(entry){

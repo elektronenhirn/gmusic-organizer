@@ -1,8 +1,10 @@
 'use strict';
 
 const Playlist = require('./Playlist.js');
+const Tag = require('./Tag.js');
 const PlaylistEntry = require('./PlaylistEntry.js');
 const logger = require('../util/Logger.js');
+const tagConfig = require('../util/TagConfig.js');
 const EventEmitter = require('events');
 
 class PlaylistManager extends EventEmitter{
@@ -13,6 +15,7 @@ class PlaylistManager extends EventEmitter{
     this._gmusicPlaylists;
     this._gmusicPlaylistsEntries;
     this._playlists = [];
+    this._tagPlaylists = [];
     this._playlistsById = new Object();
     this._allTracks = allTracks;
   }
@@ -39,7 +42,7 @@ class PlaylistManager extends EventEmitter{
         }
 
         this._gmusicPlaylistsEntries = library.data.items;
-        this._createPlaylists();
+        this._populatePlaylists();
         this.emit('updated');
       });
     });
@@ -81,6 +84,12 @@ class PlaylistManager extends EventEmitter{
 
   findByName(name){
     return this._playlists.find((element) => {
+      return element.getName() === name;
+    });
+  }
+
+  findTagByName(name){
+    return this._tagPlaylists.find((element) => {
       return element.getName() === name;
     });
   }
@@ -145,11 +154,55 @@ class PlaylistManager extends EventEmitter{
     });
   }
 
-  _createPlaylists(){
+  addTrackToTag(track, tagName){
+    let tag = this.findTagByName(tagName);
+    if (tag){
+      if (!tag.containsTrack(track)){
+        this.addTrackToPlaylist(tag, track);
+      }
+      return;
+    }
+
+    //Tag does not exists yet -> create it first
+    this.once('updated', ()=>{
+      this.addTrackToTag(track, tagName);      
+    });
+    let playlistName = tagConfig.getPlaylistPrefix() + tagName;
+    logger.debug('creating playlist ' + playlistName + ' to store tagged tracks');
+    this.newPlaylist(playlistName);
+  }
+
+  removeTrackFromTag(track, tagName){
+    let tag = this.findTagByName(tagName);
+    if (!tag){
+      logger.warning('Playlist for ' + tagName + ' not found');
+      return;
+    }
+
+    let entry = tag.getEntryByTrack(track);
+    if (!entry){
+      logger.warning('Track ' + track.getName() + ' not tagged as ' + tag.getName());
+      return;
+    }
+
+    this.removeEntryFromPlaylist(tag, entry);
+  }
+
+  _populatePlaylists(){
     let self = this;
+
+    this._allTracks.clearPlaylistAndTagsLocally();
+    
+    //enumerate all playlists
     this._gmusicPlaylists.forEach((element) => {
-      let pl = new Playlist(self, element);
-      self._playlists.push(pl);
+      let pl = null;
+      if (tagConfig.isTagPlaylist(element.name)){
+        pl = new Tag(self, element);
+        self._tagPlaylists.push(pl);
+      } else {
+        pl = new Playlist(self, element);
+        self._playlists.push(pl);
+      }
       self._playlistsById[element.id] = pl;
     });
 
@@ -157,6 +210,7 @@ class PlaylistManager extends EventEmitter{
       return a.getName() > b.getName() ? 1 : -1;
     });
 
+    //enumerate all playlist-entries
     this._gmusicPlaylistsEntries.forEach((element)=>{
       let pl = self._playlistsById[element.playlistId];
       if (!pl){
@@ -171,7 +225,11 @@ class PlaylistManager extends EventEmitter{
       let plEntry = new PlaylistEntry(this, element, track);
       
       pl.add(plEntry);
-      track.addTo(pl);
+      if (pl.isTag){
+        track.addTagLocally(pl);
+      } else {
+        track.addPlaylistLocally(pl);
+      }
     });
 
   }

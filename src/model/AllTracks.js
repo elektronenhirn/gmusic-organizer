@@ -28,6 +28,12 @@ class AllTracks{
     });
   }
 
+  clearPlaylistAndTagsLocally(){
+    this.forEach((track)=>{
+      track.clearPlaylistAndTagsLocally();
+    });
+  }
+
   getTrackById(id){
     return this._tracks.find((element) => {return element.getId() == id;});
   }

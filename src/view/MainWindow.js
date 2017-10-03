@@ -23,10 +23,10 @@ class MainWindow{
     this._playlistManager = playlistManager;
     this._popularityAutoList = popularityAutoList;
     this._outputView = new OutputView(screen, style);
-    this._playlistView = new PlaylistView(screen, style, player);
+    this._playlistView = new PlaylistView(screen, style, player, playlistManager);
     this._playlistsView = new PlaylistsView(screen, style);
     this._helpView = new HelpView(screen, style);
-    this._allTracksView = new AllTracksView(screen, style, player);
+    this._allTracksView = new AllTracksView(screen, style, player, playlistManager);
     this._focusRing = new Ring(this._playlistsView, this._playlistView, this._allTracksView);
 
     logger.setView(this._outputView);

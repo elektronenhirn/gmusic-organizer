@@ -1,10 +1,12 @@
 'use strict';
 
+const tagConfig = require('../util/TagConfig.js');
 class Track{
 
   constructor(gmusicTrackObj){
     this._track = gmusicTrackObj;
     this._playlists = new Set();
+    this._tags = new Set();
   }
 
   getId(){
@@ -23,12 +25,38 @@ class Track{
     return this._track.artist + ' - ' + this._track.title;
   }
 
-  addTo(playlist){
+  addPlaylistLocally(playlist){
     this._playlists.add(playlist);
   }
 
-  removeFrom(playlist){
-    this._playlists.delete(playlist);
+  addTagLocally(tagPlaylist){
+    this._tags.add(tagPlaylist);
+  }
+
+  clearPlaylistAndTagsLocally(){
+    this._tags = new Set();
+    this._playlists = new Set();
+  }
+
+  tagsAsString(){
+    let tagsAsArray = [...this._tags];
+    return tagsAsArray.map((playlist)=>{
+      return playlist.getName().replace(tagConfig.getPlaylistPrefix(), '');
+    });
+  }
+
+  isTaggedWith(tagName){
+    for (let tag of this._tags) {
+      if (tag.getName() === tagName){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  getTags(){
+    return this._tags;
   }
 
   popularity(){

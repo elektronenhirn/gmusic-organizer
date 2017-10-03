@@ -3,14 +3,17 @@
 var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
+const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
+const tagConfig = require('../util/TagConfig.js');
 
 class PlaylistView{
 
-  constructor(screen, style, player){
+  constructor(screen, style, player, playlistManager){
     this._screen = screen;
     this._style = style;
     this._player = player;
     this._playlist = undefined;
+    this._playlistManager = playlistManager;
     this._cursorPosStorage = {};
 
     let self = this;
@@ -99,7 +102,7 @@ class PlaylistView{
     let track = this._selectedTrack();
     logger.debug('play ' + track.getName());
 
-    this._player.play(this._playlist, this._list.selected); 
+    this._player.play(this._playlist.getTracks(), this._list.selected); 
   }
 
   onFocused(){
@@ -110,6 +113,7 @@ class PlaylistView{
     this._screen.key('C-v', this.pasteFromClipboard.bind(this));
     this._screen.key('del', this.deleteEntry.bind(this));
     this._screen.key('backspace', this.deleteEntry.bind(this));
+    this._screen.key('t', this.tagEntry.bind(this));
   }
 
   onUnFocused(){
@@ -120,6 +124,7 @@ class PlaylistView{
     this._screen.removeKeyAll('C-v');
     this._screen.removeKeyAll('del');
     this._screen.removeKeyAll('backspace');
+    this._screen.removeKeyAll('t');
   }
 
   copyToClipboard(){
@@ -149,6 +154,23 @@ class PlaylistView{
   deleteEntry(){
     let entry = this._selectedEntry();
     this._playlist.removeEntry(entry);
+  }
+
+  tagEntry(){
+    let entry = this._selectedEntry();
+    let availableTags = tagConfig.getTags();
+    let usedTags = entry.getTrack().tagsAsString();
+
+    let view = new MultiCheckboxInputView(this._screen, this._style);
+    view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
+      let track = entry.getTrack();
+      addedElements.forEach((tagName)=>{
+        this._playlistManager.addTrackToTag(track, tagName);
+      });
+      removedElements.forEach((tagName)=>{
+        this._playlistManager.removeTrackFromTag(track, tagName);
+      });
+    });
   }
 
   _selectedTrack(){

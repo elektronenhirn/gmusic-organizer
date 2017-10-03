@@ -3,14 +3,19 @@
 var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
-
+const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
+const tagConfig = require('../util/TagConfig.js');
+const Filters = require('./Filters.js');
 class AllTracksView{
 
-  constructor(screen, style, player){
+  constructor(screen, style, player, playlistManager){
     this._screen = screen;
     this._style = style;
     this._player = player;
     this._trackList = undefined;
+    this._filteredTrackList = undefined;
+    this._activeFilters = new Set();
+    this._playlistManager = playlistManager;
     let self = this;
 
     this._list = blessed.list({
@@ -64,16 +69,7 @@ class AllTracksView{
 
   showList(list){
     this._trackList = list;
-    let trackStyle = this._style.track;
-    let items = list.getTracks().map( (element) => {
-      let str = trackStyle
-        .replace('${artist}',element.getArtist())
-        .replace('${title}',element.getTitle());
-      return str;
-    } );
-
-    this._list.setItems(items || ['<empty>']);
-    this._updateTitle();
+    this._update();
   }
 
   show(){
@@ -96,19 +92,23 @@ class AllTracksView{
     let track = this._selectedTrack();
     logger.debug('play ' + track.getName());
 
-    this._player.play(this._trackList, this._list.selected); 
+    this._player.play(this._filteredTrackList, this._list.selected); 
   }
 
   onFocused(){
     this._updateTitle();
     this._screen.key('p', this.onPlay.bind(this));
     this._screen.key('C-c', this.copyToClipboard.bind(this));
+    this._screen.key('f', this.filter.bind(this));
+    this._screen.key('t', this.tagEntry.bind(this));
   }
 
   onUnFocused(){
     this._updateTitle();
     this._screen.removeKeyAll('p');
     this._screen.removeKeyAll('C-c');
+    this._screen.removeKeyAll('f');
+    this._screen.removeKeyAll('t');
   }
 
   copyToClipboard(){
@@ -120,14 +120,86 @@ class AllTracksView{
     });
   }
 
+  filter(){
+    let view = new MultiCheckboxInputView(this._screen, this._style);
+    let availableTags = tagConfig.getTags();
+    const UNTAGGED_OPTION = '[untagged]';
+    availableTags.push(UNTAGGED_OPTION);
+
+    let usedTags = [...this._activeFilters].map((filter)=>filter.getName());
+
+    view.ask('Filter by tags', availableTags, usedTags, (addedElements, removedElements, selectedTags)=>{
+      if (!selectedTags){
+        return; //user pressed esc
+      }
+
+      this._activeFilters.clear();
+
+      selectedTags.forEach((tagName)=>{
+        this._activeFilters.add(
+          tagName === UNTAGGED_OPTION 
+            ? new Filters.FilterUntagged(UNTAGGED_OPTION) 
+            : new Filters.FilterByTag(tagName)
+        );
+      });
+
+      this._update();
+    });
+  }
+
+  tagEntry(){
+    let track = this._selectedTrack();
+    let availableTags = tagConfig.getTags();
+    let usedTags = track.tagsAsString();
+
+    let view = new MultiCheckboxInputView(this._screen, this._style);
+    view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
+      addedElements.forEach((tagName)=>{
+        this._playlistManager.addTrackToTag(track, tagName);
+      });
+      removedElements.forEach((tagName)=>{
+        this._playlistManager.removeTrackFromTag(track, tagName);
+      });
+    });
+  }
+
+
   _selectedTrack(){
-    return this._trackList.getTracks()[this._list.selected];
+    return this._filteredTrackList[this._list.selected];
   }
 
   _updateTitle(){
     let template = this._list.focused ? this._style.title.focused : this._style.title.unfocused;
-    this._list.setLabel(template.replace('${title}','All tracks'));
+    let filters = this._activeFilters.size == 0 
+      ? 'none'
+      : [...this._activeFilters].map((f)=>f.getName()).join(',');
+    let nrOfEntries = this._filteredTrackList ? this._filteredTrackList.length : 0;
+    this._list.setLabel(template.replace('${title}','All tracks (' +  nrOfEntries + ')[filters=' + filters + ']'));
+
     this._screen.render();
+  }
+
+  _update(){
+    let trackStyle = this._style.track;
+    let allTracks = this._trackList.getTracks();
+    this._filteredTrackList = allTracks;
+    
+    if (this._activeFilters.size > 0){
+      this._filteredTrackList = allTracks.filter((t) => {
+        return [...this._activeFilters].filter(f=>f.matches(t)).length > 0;
+      });
+    }
+
+    let items = this._filteredTrackList.map( (element) => {
+      let str = trackStyle
+        .replace('${artist}',element.getArtist())
+        .replace('${title}',element.getTitle());
+      return str;
+    } );
+
+    this._list.setItems(items || ['<empty>']);
+
+    this._updateTitle();
   }
 
 }
