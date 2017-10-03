@@ -5,10 +5,9 @@ const tagsFile = require('user-settings').file('.gmusic-organizer/tags');
 
 const DEFAULT_TAGS = {
   lang: ['en','de','fr','it'],
-  mood:['sad','aggressive','happy'],
-  tempo:['slow', 'moderate', 'fast']
+  genre:['electro','pop','indie','folk','schlager','hiphop']
 };
-const DEFAULT_PLAYLIST_PREFIX = 'zz [Tag]';
+const DEFAULT_PLAYLIST_PREFIX = 'zz [tag] ';
 
 class TagConfig{
 
