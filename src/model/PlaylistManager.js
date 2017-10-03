@@ -214,7 +214,8 @@ class PlaylistManager extends EventEmitter{
     this._gmusicPlaylistsEntries.forEach((element)=>{
       let pl = self._playlistsById[element.playlistId];
       if (!pl){
-        throw new Error('Unable to find playlist with id ' + element.playlistId);
+        logger.warning('Unable to find playlist with id ' + element.playlistId);
+        return;
       }
 
       let track = self._allTracks.getTrackById(element.trackId);
