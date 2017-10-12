@@ -25,6 +25,10 @@ class Ring{
   current(){
     return this._elements[this._index];    
   }
+
+  index(){
+    return this._index;
+  }
 }
 
 module.exports = Ring;

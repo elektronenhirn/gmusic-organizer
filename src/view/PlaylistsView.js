@@ -1,7 +1,7 @@
 'use strict';
 
 var blessed = require('blessed');
-const YesNoInputView = require('./YesNoInputView.js');
+const YesNoDialog = require('./YesNoDialog.js');
 
 class PlaylistsView{
 
@@ -21,7 +21,7 @@ class PlaylistsView{
       height: `100%-${style.outputView.height}`,
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       border: 'line',
       scrollbar: {
         ch: ' ',
@@ -48,7 +48,7 @@ class PlaylistsView{
       width: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       tags: true,
       border: 'line',
       hidden: true
@@ -125,8 +125,8 @@ class PlaylistsView{
   deletePlaylist(){
     let playlist = this.getSelectedPlaylist();
 
-    let yesNoInputView = new YesNoInputView(this._screen, this._style);
-    yesNoInputView.ask('Really delete playlist ' + playlist.getName() + '?')
+    let dialog = new YesNoDialog(this._screen, this._style);
+    dialog.ask('Really delete playlist ' + playlist.getName() + '?')
       .then(()=>{
         this._playlistManager.deletePlaylist(playlist);      
       })

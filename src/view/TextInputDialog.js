@@ -1,11 +1,12 @@
 'use strict';
 
 var blessed = require('blessed');
+var ModalDialogBase = require('./ModalDialogBase.js');
 
-class TextInputView{
+class TextInputDialog extends ModalDialogBase{
+  
   constructor(screen, style){
-    this._screen = screen;
-    this._prompt = blessed.prompt({
+    super(screen, blessed.prompt({
       parent: screen,
       top: 'center',
       left: 'center',
@@ -13,17 +14,17 @@ class TextInputView{
       width: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       tags: true,
       border: 'line',
       hidden: true,
       style: JSON.parse(JSON.stringify(style.box)) //deep copy style
-    });
+    }));
   }
 
   ask(question, defaultReply, callback){
-    this._prompt.input(question, defaultReply, callback);
+    this._box.input(question, defaultReply, callback);
   }
 }
 
-module.exports = TextInputView;
+module.exports = TextInputDialog;

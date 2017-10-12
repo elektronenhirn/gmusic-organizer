@@ -1,11 +1,12 @@
 'use strict';
 
 var blessed = require('blessed');
+var ModalDialogBase = require('./ModalDialogBase.js');
 
-class TextInputView{
+class YesNoDialog extends ModalDialogBase{
+
   constructor(screen, style){
-    this._screen = screen;
-    this._question = blessed.question({
+    super(screen, blessed.question({
       parent: screen,
       border: 'line',
       height: 'shrink',
@@ -17,12 +18,12 @@ class TextInputView{
       keys: true,
       vi: true,
       style: JSON.parse(JSON.stringify(style.box)) //deep copy style
-    });
+    }));
   }
 
   ask(question){
     return new Promise((resolve, reject)=>{
-      this._question.ask(question, (err, value)=>{
+      this._box.ask(question, (err, value)=>{
         if (err || value === false){
           reject();
           false;
@@ -33,4 +34,4 @@ class TextInputView{
   }
 }
 
-module.exports = TextInputView;
+module.exports = YesNoDialog;

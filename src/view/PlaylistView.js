@@ -3,9 +3,8 @@
 var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
-const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
-const MessageView = require('./MessageView.js');
-const tagConfig = require('../util/TagConfig.js');
+const TagDialog = require('./TagDialog.js');
+const MessageDialog = require('./MessageDialog.js');
 const util = require('util');
 
 class PlaylistView{
@@ -29,7 +28,7 @@ class PlaylistView{
       height: `100%-${style.outputView.height}`,
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       border: 'line',
       scrollbar: {
         ch: ' ',
@@ -56,7 +55,7 @@ class PlaylistView{
       width: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       tags: true,
       border: 'line',
       hidden: true,
@@ -178,11 +177,10 @@ class PlaylistView{
       return; //nothing selected
     }
 
-    let availableTags = tagConfig.getTags();
     let usedTags = entry.getTrack().tagsAsString();
 
-    let view = new MultiCheckboxInputView(this._screen, this._style, 't');
-    view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
+    let dialog = new TagDialog(this._screen, this._style, 't', 'Select tags');
+    dialog.ask(usedTags, (addedElements, removedElements)=>{
       let track = entry.getTrack();
       addedElements.forEach((tagName)=>{
         this._playlistManager.addTrackToTag(track, tagName);
@@ -200,7 +198,7 @@ class PlaylistView{
     }
 
     let track = entry.getTrack();
-    let view = new MessageView(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
+    let view = new MessageDialog(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
     view.show();
   }
 

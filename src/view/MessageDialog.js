@@ -1,13 +1,12 @@
 'use strict';
 
 var blessed = require('blessed');
+var ModalDialogBase = require('./ModalDialogBase.js');
 
-class MessageView {
+class MessageDialog extends ModalDialogBase{
 
   constructor(screen, style, confirmKey, title, content){
-    this._screen = screen;
-    this._confirmKey = confirmKey || '';
-    this._box = blessed.box({
+    super(screen, blessed.box({
       top: '50%-15',
       left: 'center',
       height: 'shrink',
@@ -19,34 +18,24 @@ class MessageView {
         type: 'line'
       },
       style: JSON.parse(JSON.stringify(style.box)), //deep copy style
-    });
+    }));
 
-    this._box.on('focus', this.onFocused.bind(this));
-    this._box.on('blur', this.onUnFocused.bind(this));
+    this._confirmKey = confirmKey || '';
   }
 
-  show(){
-    this._screen.append(this._box);
-    this._box.focus();
-    this._screen.render();
-  }
-
-  onFocused(){
+  onShow(){
+    super.onShow();
     this._screen.key('enter', this.hide.bind(this));
-    this._screen.key('esc', this.hide.bind(this));
+    this._screen.key('escape', this.hide.bind(this));
     this._screen.key(this._confirmKey, this.hide.bind(this));
   }
 
-  onUnFocused(){
+  onHide(){
     this._screen.removeKeyAll('enter');
-    this._screen.removeKeyAll('esc');
+    this._screen.removeKeyAll('escape');
     this._screen.removeKeyAll(this._confirmKey);
-  }
-
-  hide(){
-    this._screen.remove(this._box);
-    this._screen.render();
+    super.onHide();
   }
 }
 
-module.exports = MessageView;
+module.exports = MessageDialog;

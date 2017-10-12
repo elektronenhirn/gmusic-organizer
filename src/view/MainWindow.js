@@ -4,9 +4,9 @@
 const PlaylistView = require('./PlaylistView.js');
 const PlaylistsView = require('./PlaylistsView.js');
 const OutputView = require('./OutputView.js');
-const HelpView = require('./HelpView.js');
-const AllTracksView = require('./AllTracksView.js');
-const TextInputView = require('./TextInputView.js');
+const HelpDialog = require('./HelpDialog.js');
+const TracksView = require('./TracksView.js');
+const TextInputDialog = require('./TextInputDialog.js');
 
 //styles
 const style = require('../../styles/default.json');
@@ -19,14 +19,18 @@ class MainWindow{
 
   constructor(screen, player, playlistManager, popularityAutoList){
     this._screen = screen;
+    this._screen.mainWindow = this;
     this._player = player;
     this._playlistManager = playlistManager;
     this._popularityAutoList = popularityAutoList;
+
+    this._monkeyPatchScreen();
+    
     this._outputView = new OutputView(screen, style);
     this._playlistView = new PlaylistView(screen, style, player, playlistManager);
     this._playlistsView = new PlaylistsView(screen, style);
-    this._helpView = new HelpView(screen, style);
-    this._allTracksView = new AllTracksView(screen, style, player, playlistManager);
+    this._helpDialog = new HelpDialog(screen, style);
+    this._allTracksView = new TracksView(screen, style, player, playlistManager);
     this._focusRing = new Ring(this._playlistsView, this._playlistView, this._allTracksView);
 
     logger.setView(this._outputView);
@@ -34,8 +38,7 @@ class MainWindow{
     this._playlistsView.onPlaylistSelected(this.updatePlayListView.bind(this));
     this._playlistsView.show();
     
-    this._setupKeyBindings();
-    this._monkeyPatchScreen();
+    this.onFocused();
 
     playlistManager.on('updated', this.onModelUpdated.bind(this));
     playlistManager.on('error', this.onErrorUpdatingModel.bind(this));
@@ -43,7 +46,7 @@ class MainWindow{
     screen.render();
   }
 
-  _setupKeyBindings(){
+  onFocused(){
     this._screen.key('left', ()=> {
       this._focusRing.left().focus();
     });
@@ -51,9 +54,17 @@ class MainWindow{
       this._focusRing.right().focus();
     });
     this._screen.key('h', ()=> {
-      this._helpView.toggle();
+      this._helpDialog.show();
     });
     this._screen.key('n', this.newPlaylist.bind(this));
+    this._focusRing.current().show();
+  }
+
+  onUnFocused(){
+    this._screen.removeKeyAll('left');
+    this._screen.removeKeyAll('right');
+    this._screen.removeKeyAll('h');
+    this._screen.removeKeyAll('n');
   }
 
   updatePlayListView(playlist){
@@ -83,8 +94,8 @@ class MainWindow{
   }
 
   newPlaylist(){
-    let questionView = new TextInputView(this._screen, style);
-    questionView.ask('New Playlist: enter name', '', (err, val) => {
+    let dialog = new TextInputDialog(this._screen, style);
+    dialog.ask('New Playlist: enter name', '', (err, val) => {
       if (err || val===undefined || val === null){
         return; //User pressed cancel/ESC
       }

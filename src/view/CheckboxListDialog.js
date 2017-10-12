@@ -1,20 +1,12 @@
 'use strict';
 
 var blessed = require('blessed');
+var ModalDialogBase = require('./ModalDialogBase.js');
 
-class MultiCheckboxInputView{
+class CheckboxListDialog extends ModalDialogBase{
 
   constructor(screen, style, confirmKey){
-    this._screen = screen;
-    this._style = style;
-    this._confirmKey = confirmKey || '';
-    this._callback = undefined;
-    this._elements = undefined;
-    this._initalSelection = undefined;
-    this._selected = undefined;
-
-    let self = this;
-    this._list = blessed.list({
+    super(screen, blessed.list({
       parent: screen,
       tags: true,
       draggable: false,
@@ -24,7 +16,7 @@ class MultiCheckboxInputView{
       height: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       border: 'line',
       scrollbar: {
         ch: ' ',
@@ -35,14 +27,16 @@ class MultiCheckboxInputView{
           inverse: true
         }
       },
-      style: JSON.parse(JSON.stringify(style.box)), //deep copy style
-      search: function(callback) {
-        self._prompt.input('{white-fg}Search track:{/white-fg}', '', function(err, value) {
-          if (err) return;
-          return callback(null, value);
-        });
-      }
-    });
+      style: JSON.parse(JSON.stringify(style.box)) //deep copy style
+    }));
+
+    this._box.search = (callback) => {
+      this._prompt.input('{white-fg}Search track:{/white-fg}', '', function(err, value) {
+        if (err) return;
+        return callback(null, value);
+      });
+    };
+
     this._prompt = blessed.prompt({
       parent: screen,
       top: 'center',
@@ -51,16 +45,19 @@ class MultiCheckboxInputView{
       width: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       tags: true,
       border: 'line',
       hidden: true,
       style: JSON.parse(JSON.stringify(style.box)) //deep copy style
     });
 
-    this._list.on('focus', this.onFocused.bind(this));
-    this._list.on('blur', this.onUnFocused.bind(this));
-    this._list.on('action', this.onDone.bind(this));
+    this._style = style;
+    this._confirmKey = confirmKey || '';
+    this._callback = undefined;
+    this._elements = undefined;
+    this._initalSelection = undefined;
+    this._selected = undefined;
   }
 
   ask(question, elements, selectedElements, callback){
@@ -68,11 +65,11 @@ class MultiCheckboxInputView{
     this._initalSelection = new Set(selectedElements); 
     this._selected = new Set(selectedElements);
     
-    this._list.setLabel(this._style.title.focused.replace('${title}',question));
-    this._list.height = elements.length + 2;
-    this._list.focus();
+    this._box.setLabel(this._style.title.focused.replace('${title}',question));
+    this._box.height = elements.length + 2;
     this._callback = callback;
-//    this._list.enterSelected(0);
+//    this._box.enterSelected(0);
+    this.show();
     this._update();
   }
 
@@ -88,23 +85,29 @@ class MultiCheckboxInputView{
     let items = this._elements.map((val)=>{
       return toString(this._selected.has(val), val);
     });
-    this._list.setItems(items);
-    this._list.show();
+    this._box.setItems(items);
+    this._box.show();
     this._screen.render();
   }
 
-  onFocused(){
+  onShow(){
+    super.onShow();
     this._screen.key('space', this.select.bind(this));
-    this._screen.key(this._confirmKey, this.onDone.bind(this));
+    this._screen.key(this._confirmKey, this.onDone.bind(this, true));
+    this._screen.key('enter', this.onDone.bind(this, true));
+    this._screen.key('escape', this.onDone.bind(this, false));
   }
 
-  onUnFocused(){
+  onHide(){
     this._screen.removeKeyAll('space');
     this._screen.removeKeyAll(this._confirmKey);
+    this._screen.removeKeyAll('enter');
+    this._screen.removeKeyAll('escape');
+    super.onHide();
   }
 
   select(){
-    let idx = this._list.selected;
+    let idx = this._box.selected;
     let selectedElement = this._elements[idx];
     if (this._selected.has(selectedElement)){
       this._selected.delete(selectedElement);
@@ -126,10 +129,9 @@ class MultiCheckboxInputView{
     }
 
     this._callback(addedElements, removedElements, selectedElements);
-    this._screen.remove(this._list);
-    this._screen.render();
+    this.hide();
   }
 
 }
 
-module.exports = MultiCheckboxInputView;
+module.exports = CheckboxListDialog;

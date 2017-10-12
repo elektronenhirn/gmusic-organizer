@@ -1,6 +1,6 @@
 'use strict';
 const settings = require('user-settings').file('.gmusic-organizer/credentials');
-const TextInputView = require('../view/TextInputView.js');
+const TextInputDialog = require('../view/TextInputDialog.js');
 const dotFolder = require('./DotFolder.js');
 
 class Credentials{
@@ -51,8 +51,8 @@ class Credentials{
   _askForEmailAddress(screen, style){
     let self = this;
     return new Promise((resolve,reject)=>{
-      let questionView = new TextInputView(screen, style);
-      questionView.ask('Enter your gmusic account\'s email address:',this._credentials.email || '',function(err, val){
+      let questionDialog = new TextInputDialog(screen, style);
+      questionDialog.ask('Enter your gmusic account\'s email address:',this._credentials.email || '',function(err, val){
         if (err || val===undefined || val === null){
           return reject(err); //User pressed cancel/ESC
         }
@@ -65,8 +65,8 @@ class Credentials{
   _askForPassword(screen, style){
     let self = this;
     return new Promise((resolve,reject)=>{
-      let questionView = new TextInputView(screen, style);
-      questionView.ask('Enter your (app-specific) password:','',function(err, val){
+      let questionDialog = new TextInputDialog(screen, style);
+      questionDialog.ask('Enter your (app-specific) password:','',function(err, val){
         if (err || val===undefined || val === null){
           return reject(err); //User pressed cancel/ESC
         }

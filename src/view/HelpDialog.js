@@ -1,6 +1,7 @@
 'use strict';
 
 var blessed = require('blessed');
+var ModalDialogBase = require('./ModalDialogBase.js');
 
 const CONTENT =
 '{white-fg}' + 
@@ -28,11 +29,10 @@ const CONTENT =
 ' del/backspace remove song from playlist\n' +
 '{/white-fg}'; 
 
-class HelpView {
+class HelpDialog extends ModalDialogBase{
 
   constructor(screen, style){
-    this._screen = screen;
-    this._box = blessed.box({
+    super(screen, blessed.box({ 
       top: '50%-15',
       left: 'center',
       height: 'shrink',
@@ -44,27 +44,25 @@ class HelpView {
         type: 'line'
       },
       style: JSON.parse(JSON.stringify(style.box)), //deep copy style
+    }));
+  }
+
+  onShow(){
+    super.onShow();
+    this._screen.key('h', ()=>{
+      this.hide();
+    });
+    this._screen.key('escape', ()=>{
+      this.hide();
     });
   }
 
-  toggle(){
-    if (this._box.visible){
-      this.hide();
-    } else {
-      this.show();
-    }
+  onHide(){
+    this._screen.removeKeyAll('h');
+    this._screen.removeKeyAll('escape');
+    super.onHide();
   }
 
-  show(){
-    this._screen.append(this._box);
-    this._box.focus();
-    this._screen.render();
-  }
-
-  hide(){
-    this._screen.remove(this._box);
-    this._screen.render();
-  }
 }
 
-module.exports = HelpView;
+module.exports = HelpDialog;

@@ -3,13 +3,14 @@
 var blessed = require('blessed');
 const logger = require('../util/Logger.js');
 const clipboard = require('../util/Clipboard.js');
-const MultiCheckboxInputView = require('./MultiCheckboxInputView.js');
-const MessageView = require('./MessageView.js');
+const CheckboxListDialog = require('./CheckboxListDialog.js');
+const MessageDialog = require('./MessageDialog.js');
 const tagConfig = require('../util/TagConfig.js');
 const Filters = require('./Filters.js');
 const util = require('util');
+const TagDialog = require('./TagDialog.js');
 
-class AllTracksView{
+class TracksView{
 
   constructor(screen, style, player, playlistManager){
     this._screen = screen;
@@ -31,7 +32,7 @@ class AllTracksView{
       height: `100%-${style.outputView.height}`,
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       border: 'line',
       scrollbar: {
         ch: ' ',
@@ -58,7 +59,7 @@ class AllTracksView{
       width: 'shrink',
       keys: true,
       vi: true,
-      mouse: true,
+      mouse: false,
       tags: true,
       border: 'line',
       hidden: true,
@@ -130,14 +131,14 @@ class AllTracksView{
   }
 
   filter(){
-    let view = new MultiCheckboxInputView(this._screen, this._style, 'f');
-    let availableTags = tagConfig.getTags();
+    let dialog = new CheckboxListDialog(this._screen, this._style, 'f');
+    let availableTags = tagConfig.getQualifiedTags();
     const UNTAGGED_OPTION = '[untagged]';
     availableTags.push(UNTAGGED_OPTION);
 
     let usedTags = [...this._activeFilters].map((filter)=>filter.getName());
 
-    view.ask('Filter by tags', availableTags, usedTags, (addedElements, removedElements, selectedTags)=>{
+    dialog.ask('Filter by tags', availableTags, usedTags, (addedElements, removedElements, selectedTags)=>{
       if (!selectedTags){
         return; //user pressed esc
       }
@@ -162,11 +163,10 @@ class AllTracksView{
       return; //nothing selected
     }
 
-    let availableTags = tagConfig.getTags();
     let usedTags = track.tagsAsString();
-
-    let view = new MultiCheckboxInputView(this._screen, this._style, 't');
-    view.ask('Select tags', availableTags, usedTags, (addedElements, removedElements)=>{
+    
+    let dialog = new TagDialog(this._screen, this._style, 't', 'Select tags');
+    dialog.ask(usedTags, (addedElements, removedElements)=>{
       addedElements.forEach((tagName)=>{
         this._playlistManager.addTrackToTag(track, tagName);
       });
@@ -182,7 +182,7 @@ class AllTracksView{
       return; //nothing selected
     }
 
-    let view = new MessageView(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
+    let view = new MessageDialog(this._screen, this._style, 'i', 'Info: ' + track.getName(), util.inspect(track._track));
     view.show();
   }
 
@@ -226,4 +226,4 @@ class AllTracksView{
 
 }
 
-module.exports = AllTracksView;
+module.exports = TracksView;
