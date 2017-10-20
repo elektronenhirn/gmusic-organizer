@@ -6,7 +6,9 @@ A node.js playlist organizer for google play music running in a terminal. Powere
 
 ## Installation
 
-The dependency tree contains native node.js modules. Parts of them need to be compiled during installation. So you need a C++ toolchain (compiler/linker) on your machine.
+The dependency tree contains native node.js modules. Parts of them need to be compiled during installation.
+
+Compilation requires a C++ toolchain (compiler/linker) on your machine. See [node-gyp](https://www.npmjs.com/package/node-gyp) for installation instructions. 
 
 #### Ubuntu 16.04
 
@@ -31,6 +33,8 @@ If the login step fails, you might need to:
 
 After a successful authentication, a master token is created and stored in `~/.gmusic-organizer/credentials`.
 
+### Controls
+
 Hit `h` to get a list of available controls.
 
 ```
@@ -40,6 +44,9 @@ General
  F5            refresh
  q             quit
  /             search for track in current view
+ t             tag a track
+ f             filter all tracks view by tag
+ i             show track info
 
 Built in player
 
@@ -61,6 +68,39 @@ Playlist manipulation
  del/backspace remove song from playlist
 ```
 
-## Logging
+### Tagging
 
-Each session creates a logfile at `~/.gmusic-organizer/log.txt`. Look into this file if you experience any problems.
+The core idea of the gmusic-organizer is organizing songs and creating playlists by tags. Songs can be tagged with the `t` shortcut key. 
+
+Currently it is not possible to change the list of avilable tags with the gmusic-organizer. However the tags are defined in this file:  `~/.gmusic-organizer/tags`. Edit this file to add/remove tags.
+
+Original file content:
+```
+{
+  "tags": {
+    "lang": [
+      "en",
+      "de",
+      "fr",
+      "it"
+    ],
+    "genre": [
+      "electro",
+      "pop",
+      "indie",
+      "folk",
+      "schlager",
+      "hiphop"
+    ]
+  },
+  "playlistPrefix": "zz [tag] "
+}
+```
+
+Tags per song are stored in tag playlists. So song tags are shared across multiple devices.
+
+These tag playlists are hidden in gmusic-organizer. However they will be visible on other gmusic clients (e.g. your smartphone). They are identified by a special playlistPrefix. I picked `zz [tag]` for the moment so that these playlist show up at the end of my smartphone device.
+
+## Logging/Debugging
+
+Each session creates a logfile at `~/.gmusic-organizer/log.txt`. Inspect this file if you experience any problems.
