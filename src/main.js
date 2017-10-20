@@ -34,7 +34,8 @@ var popularityAutoList = new PopularityAutoList(tracks);
 
 var screen = blessed.screen({
   smartCSR: true,
-  dockBorders: true
+  dockBorders: true,
+  title: 'gmusic-organizer ' + require('../package.json').version
 });
 
 var mainWindow = new MainWindow(screen,player,playlistManager,popularityAutoList);
