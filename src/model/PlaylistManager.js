@@ -18,32 +18,42 @@ class PlaylistManager extends EventEmitter{
     this._tagPlaylists = [];
     this._playlistsById = new Object();
     this._allTracks = allTracks;
+    this._ongoingFetch = Promise.resolve();
   }
 
   /**
    * emits 'updated' or 'error'
    */
   fetchPlaylists(){
-    this._playlists = [];
-    this._playlistsById = new Object();
+    //queue fetch requests
+    this._ongoingFetch = this._ongoingFetch.then(this._doFetchPlaylists.bind(this));
+  }
 
-    this._pm.getPlayLists((err, data) => {
-      if (err){
-        this.emit('error', new Error('failed to fetch playlists from gmusic', err));
-        return;
-      }
+  _doFetchPlaylists(){
+    return new Promise((resolve)=>{
 
-      this._gmusicPlaylists = data.data.items;
-      
-      this._pm.getPlayListEntries((err, library) => {
+      this._playlists = [];
+      this._playlistsById = new Object();
+  
+      this._pm.getPlayLists((err, data) => {
         if (err){
-          this.emit('error', new Error('failed to fetch playlists entries from gmusic', err));
-          return;
+          this.emit('error', new Error('failed to fetch playlists from gmusic', err));
+          return resolve();
         }
-
-        this._gmusicPlaylistsEntries = library.data.items;
-        this._populatePlaylists();
-        this.emit('updated');
+  
+        this._gmusicPlaylists = data.data.items;
+        
+        this._pm.getPlayListEntries((err, library) => {
+          if (err){
+            this.emit('error', new Error('failed to fetch playlists entries from gmusic', err));
+            return resolve();
+          }
+  
+          this._gmusicPlaylistsEntries = library.data.items;
+          this._populatePlaylists();
+          this.emit('updated');
+          resolve();
+        });
       });
     });
   }
