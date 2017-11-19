@@ -17,7 +17,7 @@ const logger = require('../util/Logger.js');
 
 class MainWindow {
 
-  constructor(screen, player, playlistManager, popularityAutoList) {
+  constructor(screen, player, downloader, playlistManager, popularityAutoList) {
     this._screen = screen;
     this._screen.mainWindow = this;
     this._player = player;
@@ -28,7 +28,7 @@ class MainWindow {
 
     this._outputView = new OutputView(screen, style);
     this._playlistView = new PlaylistView(screen, style, player, playlistManager);
-    this._playlistsView = new PlaylistsView(screen, style);
+    this._playlistsView = new PlaylistsView(screen, style, downloader);
     this._helpDialog = new HelpDialog(screen, style);
     this._allTracksView = new TracksView(screen, style, player, playlistManager);
     this._focusRing = new Ring(this._playlistsView, this._playlistView, this._allTracksView);

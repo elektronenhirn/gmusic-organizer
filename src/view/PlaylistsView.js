@@ -5,9 +5,10 @@ const YesNoDialog = require('./YesNoDialog.js');
 
 class PlaylistsView {
 
-  constructor(screen, style) {
+  constructor(screen, style, downloader) {
     this._screen = screen;
     this._style = style;
+    this._downloader = downloader;
     this._playlistManager = undefined;
 
     let self = this;
@@ -114,12 +115,14 @@ class PlaylistsView {
     this._updateTitle();
     this._screen.key('del', this.deletePlaylist.bind(this));
     this._screen.key('backspace', this.deletePlaylist.bind(this));
+    this._screen.key('d', this.downloadPlaylist.bind(this));
   }
 
   onUnFocused() {
     this._updateTitle();
     this._screen.removeKeyAll('del');
     this._screen.removeKeyAll('backspace');
+    this._screen.removeKeyAll('d');
   }
 
   deletePlaylist() {
@@ -129,6 +132,17 @@ class PlaylistsView {
     dialog.ask('Really delete playlist ' + playlist.getName() + '?')
       .then(() => {
         this._playlistManager.deletePlaylist(playlist);
+      })
+      .catch(() => /*dont care*/ { });
+  }
+
+  downloadPlaylist() {
+    let playlist = this.getSelectedPlaylist();
+
+    let dialog = new YesNoDialog(this._screen, this._style);
+    dialog.ask('Download playlist ' + playlist.getName() + '?')
+      .then(() => {
+        this._downloader.downloadPlaylist(playlist);
       })
       .catch(() => /*dont care*/ { });
   }

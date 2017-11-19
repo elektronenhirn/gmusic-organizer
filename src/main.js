@@ -5,6 +5,7 @@
 //my utils
 const credentials = require('./util/Credentials.js');
 const Player = require('./util/Player.js');
+const Downloader = require('./util/Downloader.js');
 const logger = require('./util/Logger.js');
 global.verbose = true;
 require('./util/ErrorHooks.js');
@@ -26,6 +27,7 @@ const blessed = require('blessed');
 
 const pm = new PlayMusic();
 var player = new Player(pm);
+var downloader = new Downloader(pm);
 
 //instantiate data models
 var tracks = new AllTracks(pm);
@@ -38,7 +40,7 @@ var screen = blessed.screen({
   title: 'gmusic-organizer ' + require('../package.json').version
 });
 
-var mainWindow = new MainWindow(screen, player, playlistManager, popularityAutoList);
+var mainWindow = new MainWindow(screen, player, downloader, playlistManager, popularityAutoList);
 
 function tryToLogin() {
 

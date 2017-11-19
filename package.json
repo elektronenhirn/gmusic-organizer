@@ -20,9 +20,10 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "colors": "^1.1.2",
-    "user-settings": "^0.1.5",
+    "follow-redirects": "^1.2.5",
     "playmusic": "elektronenhirn/playmusic",
-    "stream-player": "elektronenhirn/node-stream-player"
+    "stream-player": "elektronenhirn/node-stream-player",
+    "user-settings": "^0.1.5"
   },
   "repository": {
     "type": "git",
