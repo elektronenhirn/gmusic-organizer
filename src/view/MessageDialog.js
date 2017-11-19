@@ -3,9 +3,9 @@
 var blessed = require('blessed');
 var ModalDialogBase = require('./ModalDialogBase.js');
 
-class MessageDialog extends ModalDialogBase{
+class MessageDialog extends ModalDialogBase {
 
-  constructor(screen, style, confirmKey, title, content){
+  constructor(screen, style, confirmKey, title, content) {
     super(screen, blessed.box({
       top: '50%-15',
       left: 'center',
@@ -23,14 +23,14 @@ class MessageDialog extends ModalDialogBase{
     this._confirmKey = confirmKey || '';
   }
 
-  onShow(){
+  onShow() {
     super.onShow();
     this._screen.key('enter', this.hide.bind(this));
     this._screen.key('escape', this.hide.bind(this));
     this._screen.key(this._confirmKey, this.hide.bind(this));
   }
 
-  onHide(){
+  onHide() {
     this._screen.removeKeyAll('enter');
     this._screen.removeKeyAll('escape');
     this._screen.removeKeyAll(this._confirmKey);

@@ -3,9 +3,9 @@
 var blessed = require('blessed');
 const YesNoDialog = require('./YesNoDialog.js');
 
-class PlaylistsView{
+class PlaylistsView {
 
-  constructor(screen, style){
+  constructor(screen, style) {
     this._screen = screen;
     this._style = style;
     this._playlistManager = undefined;
@@ -33,8 +33,8 @@ class PlaylistsView{
         }
       },
       style: JSON.parse(JSON.stringify(style.box)), //deep copy style
-      search: function(callback) {
-        self._prompt.input('Search:', '', function(err, value) {
+      search: function (callback) {
+        self._prompt.input('Search:', '', function (err, value) {
           if (err) return;
           return callback(null, value);
         });
@@ -59,83 +59,83 @@ class PlaylistsView{
     this._updateTitle();
   }
 
-  showPlaylists(playlistManager){
+  showPlaylists(playlistManager) {
     this._playlistManager = playlistManager;
 
     let playlistNames = this._playlistManager.entriesAsStringArray();
 
     let playlistStyle = this._style.playlist;
-    
-    playlistNames = playlistNames.map((element)=>{
+
+    playlistNames = playlistNames.map((element) => {
       return playlistStyle.replace('${playlist}', element);
     });
     this._list.setItems(playlistNames);
     this._screen.render();
   }
 
-  show(){
+  show() {
     this._list.focus();
     this._list.show();
     this._list.enterSelected(0);
     this._screen.render();
   }
 
-  hide(){
+  hide() {
     this._list.hide();
     this._screen.render();
   }
 
-  focus(){
+  focus() {
     this._list.focus();
   }
 
-  onPlaylistSelected(callback){
+  onPlaylistSelected(callback) {
     let list = this._list;
-    list.on('select item', (el, selected)=> {
+    list.on('select item', (el, selected) => {
       if (list._.rendering || !el) return;
 
       callback(this.getSelectedPlaylist());
     });
   }
 
-  selected(){
+  selected() {
     return this._list.selected;
   }
 
-  getSelectedPlaylist(){
+  getSelectedPlaylist() {
     return this._playlistManager.getPlaylist(this.selected());
   }
 
-  select(idx){
+  select(idx) {
     this._list.select(idx);
   }
 
-  onFocused(){
+  onFocused() {
     this._updateTitle();
     this._screen.key('del', this.deletePlaylist.bind(this));
     this._screen.key('backspace', this.deletePlaylist.bind(this));
   }
 
-  onUnFocused(){
+  onUnFocused() {
     this._updateTitle();
     this._screen.removeKeyAll('del');
     this._screen.removeKeyAll('backspace');
   }
 
-  deletePlaylist(){
+  deletePlaylist() {
     let playlist = this.getSelectedPlaylist();
 
     let dialog = new YesNoDialog(this._screen, this._style);
     dialog.ask('Really delete playlist ' + playlist.getName() + '?')
-      .then(()=>{
-        this._playlistManager.deletePlaylist(playlist);      
+      .then(() => {
+        this._playlistManager.deletePlaylist(playlist);
       })
-      .catch(()=> /*dont care*/ {});
+      .catch(() => /*dont care*/ { });
   }
 
-  _updateTitle(){
+  _updateTitle() {
     let template = this._list.focused ? this._style.title.focused : this._style.title.unfocused;
-    this._list.setLabel(template.replace('${title}','Playlists'));
+    this._list.setLabel(template.replace('${title}', 'Playlists'));
     this._screen.render();
   }
 

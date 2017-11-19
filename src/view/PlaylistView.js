@@ -7,9 +7,9 @@ const TagDialog = require('./TagDialog.js');
 const MessageDialog = require('./MessageDialog.js');
 const util = require('util');
 
-class PlaylistView{
+class PlaylistView {
 
-  constructor(screen, style, player, playlistManager){
+  constructor(screen, style, player, playlistManager) {
     this._screen = screen;
     this._style = style;
     this._player = player;
@@ -40,8 +40,8 @@ class PlaylistView{
         }
       },
       style: JSON.parse(JSON.stringify(style.box)), //deep copy style
-      search: function(callback) {
-        self._prompt.input('{white-fg}Search track:{/white-fg}', '', function(err, value) {
+      search: function (callback) {
+        self._prompt.input('{white-fg}Search track:{/white-fg}', '', function (err, value) {
           if (err) return;
           return callback(null, value);
         });
@@ -66,15 +66,15 @@ class PlaylistView{
     this._list.on('blur', this.onUnFocused.bind(this));
   }
 
-  showPlaylist(playlist){
+  showPlaylist(playlist) {
     this._storeCursorPos();
     this._playlist = playlist;
     let trackStyle = this._style.track;
-    
-    let items = playlist.getEntries().map( (element) => {
+
+    let items = playlist.getEntries().map((element) => {
       let str = trackStyle
-        .replace('${artist}',element.getArtist())
-        .replace('${title}',element.getTitle());
+        .replace('${artist}', element.getArtist())
+        .replace('${title}', element.getTitle());
       return str;
     });
 
@@ -83,30 +83,30 @@ class PlaylistView{
     this._recoverCursorPos();
   }
 
-  show(){
+  show() {
     this._list.focus();
     this._list.enterSelected(0);
     this._list.show();
     this._screen.render();
   }
 
-  hide(){
+  hide() {
     this._list.hide();
     this._screen.render();
   }
 
-  focus(){
+  focus() {
     this._list.focus();
   }
 
-  onPlay(){
+  onPlay() {
     let track = this._selectedTrack();
     logger.debug('play ' + track.getName());
 
-    this._player.play(this._playlist.getTracks(), this._list.selected); 
+    this._player.play(this._playlist.getTracks(), this._list.selected);
   }
 
-  onFocused(){
+  onFocused() {
     this._updateTitle();
     this._screen.key('p', this.onPlay.bind(this));
     this._screen.key('C-c', this.copyToClipboard.bind(this));
@@ -118,7 +118,7 @@ class PlaylistView{
     this._screen.key('i', this.showInfo.bind(this));
   }
 
-  onUnFocused(){
+  onUnFocused() {
     this._updateTitle();
     this._screen.removeKeyAll('p');
     this._screen.removeKeyAll('C-c');
@@ -130,70 +130,70 @@ class PlaylistView{
     this._screen.removeKeyAll('i');
   }
 
-  copyToClipboard(){
+  copyToClipboard() {
     let entry = this._selectedEntry();
-    if (!entry){
+    if (!entry) {
       return; //nothing selected
     }
 
     logger.verbose('copy ' + entry.getName());
 
-    clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry)=>{
+    clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry) => {
       playlist.addTrack(clipboard.content().getTrack(), selectedPlaylistEntry);
     });
   }
 
-  cutToClipboard(){
+  cutToClipboard() {
     let entry = this._selectedEntry();
-    if (!entry){
+    if (!entry) {
       return; //nothing selected
     }
 
     logger.verbose('cut ' + entry.getName());
 
-    clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry)=>{
+    clipboard.set(entry, (clipboard, playlist, selectedPlaylistEntry) => {
       playlist.moveEntryAfter(entry, selectedPlaylistEntry);
       clipboard.clear();
     });
   }
-  
-  pasteFromClipboard(){
+
+  pasteFromClipboard() {
     logger.verbose('paste');
     clipboard.paste(this._playlist, this._selectedEntry());
   }
 
-  deleteEntry(){
+  deleteEntry() {
     let entry = this._selectedEntry();
-    if (!entry){
+    if (!entry) {
       return; //nothing selected
     }
 
     this._playlist.removeEntry(entry);
   }
 
-  tagEntry(){
+  tagEntry() {
     let entry = this._selectedEntry();
-    if (!entry){
+    if (!entry) {
       return; //nothing selected
     }
 
     let usedTags = entry.getTrack().tagsAsString();
 
     let dialog = new TagDialog(this._screen, this._style, 't', 'Select tags');
-    dialog.ask(usedTags, (addedElements, removedElements)=>{
+    dialog.ask(usedTags, (addedElements, removedElements) => {
       let track = entry.getTrack();
-      addedElements.forEach((tagName)=>{
+      addedElements.forEach((tagName) => {
         this._playlistManager.addTrackToTag(track, tagName);
       });
-      removedElements.forEach((tagName)=>{
+      removedElements.forEach((tagName) => {
         this._playlistManager.removeTrackFromTag(track, tagName);
       });
     });
   }
 
-  showInfo(){
+  showInfo() {
     let entry = this._selectedEntry();
-    if (!entry){
+    if (!entry) {
       return; //nothing selected
     }
 
@@ -202,42 +202,42 @@ class PlaylistView{
     view.show();
   }
 
-  _selectedTrack(){
+  _selectedTrack() {
     return this._selectedEntry().getTrack();
   }
 
-  _selectedEntry(){
+  _selectedEntry() {
     let idx = this._list.selected;
     return this._playlist.getEntryAt(idx);
   }
 
-  _updateTitle(){
-    if (this._playlist){
+  _updateTitle() {
+    if (this._playlist) {
       let template = this._list.focused ? this._style.title.focused : this._style.title.unfocused;
-      this._list.setLabel(template.replace('${title}',this._playlist.getName()));
+      this._list.setLabel(template.replace('${title}', this._playlist.getName()));
       this._screen.render();
     }
   }
 
-  _storeCursorPos(){
-    if (this._playlist){
+  _storeCursorPos() {
+    if (this._playlist) {
       let cursorPos = this._list.selected;
       this._cursorPosStorage[this._playlist.getName()] = cursorPos;
     }
   }
 
-  _recoverCursorPos(){
-    if (this._playlist){
+  _recoverCursorPos() {
+    if (this._playlist) {
 
       let cursorPos = this._cursorPosStorage[this._playlist.getName()];
       let playlistLength = this._playlist.getLength();
-      if (cursorPos){
+      if (cursorPos) {
         cursorPos = (cursorPos >= playlistLength) ? playlistLength : cursorPos;
-      } else if (playlistLength > 0){
+      } else if (playlistLength > 0) {
         cursorPos = 0;
       }
 
-      if (cursorPos !== undefined){
+      if (cursorPos !== undefined) {
         this._list.select(cursorPos);
       }
     }

@@ -2,69 +2,69 @@
 
 class Playlist {
 
-  constructor(playlistManager, gmusicPlaylistObj){
+  constructor(playlistManager, gmusicPlaylistObj) {
     this._playlistManager = playlistManager;
     this._entries = [];
     this._gmusicPlaylistObj = gmusicPlaylistObj;
   }
 
-  getEntries(){
+  getEntries() {
     return this._entries;
   }
 
-  getTracks(){
-    return this._entries.map((element)=>element.getTrack());
+  getTracks() {
+    return this._entries.map((element) => element.getTrack());
   }
 
-  getEntryAt(idx){
+  getEntryAt(idx) {
     return this._entries[idx];
   }
 
-  getEntryByTrack(track){
+  getEntryByTrack(track) {
     return this._entries.find((entry) => entry.getTrack() === track);
   }
 
-  getLength(){
+  getLength() {
     return this._entries.length;
   }
 
-  add(playlistEntry){
+  add(playlistEntry) {
     this._entries.push(playlistEntry);
-    this._entries.sort((a,b)=>{
+    this._entries.sort((a, b) => {
       return (a.getAbsolutePosition() > b.getAbsolutePosition()) ? 1 : -1;
     });
   }
 
-  getName(){
+  getName() {
     return this._gmusicPlaylistObj.name;
   }
 
-  getId(){
+  getId() {
     return this._gmusicPlaylistObj.id;
   }
 
-  moveEntryAfter(entry, entryBefore){
+  moveEntryAfter(entry, entryBefore) {
     let entryAfter = this._getEntryAfter(entryBefore);
     this._playlistManager.moveEntry(entry, entryBefore, entryAfter);
   }
 
-  addTrack(track, entryBefore){
+  addTrack(track, entryBefore) {
     let entryAfter = this._getEntryAfter(entryBefore);
     this._playlistManager.addTrackToPlaylist(this, track, entryBefore, entryAfter);
   }
 
-  removeEntry(entry){
+  removeEntry(entry) {
     this._playlistManager.removeEntryFromPlaylist(this, entry);
   }
 
-  containsTrack(track){
-    return this._entries.find((entry)=>entry.getTrack() === track);
+  containsTrack(track) {
+    return this._entries.find((entry) => entry.getTrack() === track);
   }
 
-  _getEntryAfter(entry){
+  _getEntryAfter(entry) {
     let entryBeforeIdx = this._entries.indexOf(entry);
-    if ((entryBeforeIdx+1) < this._entries.length){
-      return this._entries[entryBeforeIdx+1];
+    if ((entryBeforeIdx + 1) < this._entries.length) {
+      return this._entries[entryBeforeIdx + 1];
     }
     return null;
   }

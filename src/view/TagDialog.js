@@ -5,13 +5,13 @@ var tagConfig = require('../util/TagConfig.js');
 var ModalDialogBase = require('./ModalDialogBase.js');
 const Ring = require('../util/Ring.js');
 
-class TagDialog extends ModalDialogBase{
+class TagDialog extends ModalDialogBase {
 
-  constructor(screen, style, confirmKey, title){
+  constructor(screen, style, confirmKey, title) {
     super(screen, blessed.box({
       top: 'center',
       left: 'center',
-      height: tagConfig.getMaxNumberOfTagsPerCategory()+2+2+2,
+      height: tagConfig.getMaxNumberOfTagsPerCategory() + 2 + 2 + 2,
       width: 'shrink',
       label: style.title.focused.replace('${title}', title),
       tags: true,
@@ -33,7 +33,7 @@ class TagDialog extends ModalDialogBase{
     let tagCategories = Object.keys(tagsTree);
     let width = 20;
 
-    tagCategories.forEach((key, idx)=>{
+    tagCategories.forEach((key, idx) => {
       let labelTemplate = (idx === 0) ? style.title.focused : style.title.unfocused;
       let list = blessed.list({
         parent: screen,
@@ -63,11 +63,11 @@ class TagDialog extends ModalDialogBase{
       this._tagLists.push(list);
     });
 
-    this._focusRing = new Ring(...this._tagLists);    
+    this._focusRing = new Ring(...this._tagLists);
   }
 
-  ask(selectedTags, callback){
-    this._initalSelection = new Set(selectedTags); 
+  ask(selectedTags, callback) {
+    this._initalSelection = new Set(selectedTags);
     this._selected = new Set(selectedTags);
     this._callback = callback;
     this._update();
@@ -75,7 +75,7 @@ class TagDialog extends ModalDialogBase{
     this._focusRing.current().focus();
   }
 
-  onShow(){
+  onShow() {
     super.onShow();
     this._screen.key('space', this.select.bind(this));
     this._screen.key('enter', this.onDone.bind(this, true));
@@ -85,7 +85,7 @@ class TagDialog extends ModalDialogBase{
     this._screen.key('right', this.focusRight.bind(this));
   }
 
-  onHide(){
+  onHide() {
     this._screen.removeKeyAll('space');
     this._screen.removeKeyAll('enter');
     this._screen.removeKeyAll(this._confirmKey);
@@ -95,18 +95,18 @@ class TagDialog extends ModalDialogBase{
     super.onHide();
   }
 
-  focusLeft(){
+  focusLeft() {
     this._focusRing.left();
     this.focus();
   }
 
-  focusRight(){
+  focusRight() {
     this._focusRing.right();
     this.focus();
   }
 
-  focus(){
-    Object.keys(tagConfig.getConfig()).forEach( (key, idx) => {
+  focus() {
+    Object.keys(tagConfig.getConfig()).forEach((key, idx) => {
       let list = this._tagLists[idx];
       let template = (idx === this._focusRing.index()) ? this._style.title.focused : this._style.title.unfocused;
       list.setLabel(template.replace('${title}', key));
@@ -115,12 +115,12 @@ class TagDialog extends ModalDialogBase{
     this._focusRing.current().focus();
   }
 
-  onDone(passResult){
+  onDone(passResult) {
     let addedElements = [];
     let removedElements = [];
     let selectedElements = null;
 
-    if (passResult){
+    if (passResult) {
       addedElements = [...this._selected].filter(name => !this._initalSelection.has(name));
       removedElements = [...this._initalSelection].filter(name => !this._selected.has(name));
       selectedElements = [...this._selected];
@@ -130,12 +130,12 @@ class TagDialog extends ModalDialogBase{
     this.hide();
   }
 
-  select(){
+  select() {
     let selectedCategory = this._focusRing.index();
     let idx = this._focusRing.current().selected;
-    let tag = tagConfig.getQualifiedTag(selectedCategory,idx);
+    let tag = tagConfig.getQualifiedTag(selectedCategory, idx);
 
-    if (this._selected.has(tag)){
+    if (this._selected.has(tag)) {
       this._selected.delete(tag);
     } else {
       this._selected.add(tag);
@@ -143,19 +143,19 @@ class TagDialog extends ModalDialogBase{
     this._update();
   }
 
-  _update(){
+  _update() {
     let checkboxStyle = this._style.checkbox;
 
-    let toString = function(checked, label){
+    let toString = function (checked, label) {
       return checkboxStyle
-        .replace('${checkbox}',checked ? 'x' : ' ')
+        .replace('${checkbox}', checked ? 'x' : ' ')
         .replace('${label}', label);
     };
 
-    Object.keys(tagConfig.getConfig()).forEach( (key, idx) => {
+    Object.keys(tagConfig.getConfig()).forEach((key, idx) => {
       let list = this._tagLists[idx];
-      
-      let items = tagConfig.getConfig()[key].map((val)=>{
+
+      let items = tagConfig.getConfig()[key].map((val) => {
         return toString(this._selected.has(key + ':' + val), val);
       });
       list.setItems(items);

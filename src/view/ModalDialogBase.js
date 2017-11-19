@@ -1,31 +1,31 @@
 'use strict';
 
-class ModalDialogBase{
-  
-  constructor(screen, box){
+class ModalDialogBase {
+
+  constructor(screen, box) {
     this._screen = screen;
     this._box = box;
   }
 
-  show(){
+  show() {
     this._screen.append(this._box);
     this._box.focus();
     this._screen.render();
     this.onShow();
   }
 
-  hide(){
+  hide() {
     this._screen.remove(this._box);
     this._screen.render();
     this.onHide();
   }
 
-  onShow(){
+  onShow() {
     this._screen.mainWindow.onUnFocused();
   }
 
-  onHide(){
-    this._screen.mainWindow.onFocused();    
+  onHide() {
+    this._screen.mainWindow.onFocused();
   }
 
 }

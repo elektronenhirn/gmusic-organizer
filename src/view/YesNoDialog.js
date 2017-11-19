@@ -3,9 +3,9 @@
 var blessed = require('blessed');
 var ModalDialogBase = require('./ModalDialogBase.js');
 
-class YesNoDialog extends ModalDialogBase{
+class YesNoDialog extends ModalDialogBase {
 
-  constructor(screen, style){
+  constructor(screen, style) {
     super(screen, blessed.question({
       parent: screen,
       border: 'line',
@@ -21,10 +21,10 @@ class YesNoDialog extends ModalDialogBase{
     }));
   }
 
-  ask(question){
-    return new Promise((resolve, reject)=>{
-      this._box.ask(question, (err, value)=>{
-        if (err || value === false){
+  ask(question) {
+    return new Promise((resolve, reject) => {
+      this._box.ask(question, (err, value) => {
+        if (err || value === false) {
           reject();
           false;
         }

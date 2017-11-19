@@ -15,9 +15,9 @@ const style = require('../../styles/default.json');
 const Ring = require('../util/Ring.js');
 const logger = require('../util/Logger.js');
 
-class MainWindow{
+class MainWindow {
 
-  constructor(screen, player, playlistManager, popularityAutoList){
+  constructor(screen, player, playlistManager, popularityAutoList) {
     this._screen = screen;
     this._screen.mainWindow = this;
     this._player = player;
@@ -25,7 +25,7 @@ class MainWindow{
     this._popularityAutoList = popularityAutoList;
 
     this._monkeyPatchScreen();
-    
+
     this._outputView = new OutputView(screen, style);
     this._playlistView = new PlaylistView(screen, style, player, playlistManager);
     this._playlistsView = new PlaylistsView(screen, style);
@@ -37,46 +37,46 @@ class MainWindow{
 
     this._playlistsView.onPlaylistSelected(this.updatePlayListView.bind(this));
     this._playlistsView.show();
-    
+
     this.onFocused();
 
     playlistManager.on('updated', this.onModelUpdated.bind(this));
     playlistManager.on('error', this.onErrorUpdatingModel.bind(this));
-    
+
     screen.render();
   }
 
-  onFocused(){
-    this._screen.key('left', ()=> {
+  onFocused() {
+    this._screen.key('left', () => {
       this._focusRing.left().focus();
     });
-    this._screen.key('right', ()=> {
+    this._screen.key('right', () => {
       this._focusRing.right().focus();
     });
-    this._screen.key('h', ()=> {
+    this._screen.key('h', () => {
       this._helpDialog.show();
     });
     this._screen.key('n', this.newPlaylist.bind(this));
     this._focusRing.current().show();
   }
 
-  onUnFocused(){
+  onUnFocused() {
     this._screen.removeKeyAll('left');
     this._screen.removeKeyAll('right');
     this._screen.removeKeyAll('h');
     this._screen.removeKeyAll('n');
   }
 
-  updatePlayListView(playlist){
+  updatePlayListView(playlist) {
     this._playlistView.showPlaylist(playlist);
   }
 
-  onModelUpdated(){
+  onModelUpdated() {
     this._playlistsView.showPlaylists(this._playlistManager);
     let selectedIdx = this._playlistsView.selected();
     let numberOfPlaylists = this._playlistManager.getPlaylists().lenght;
 
-    if (numberOfPlaylists > 0){
+    if (numberOfPlaylists > 0) {
       selectedIdx = (selectedIdx >= numberOfPlaylists) ? 0 : selectedIdx;
       this._playlistsView.select(selectedIdx);
       this.updatePlayListView(this._playlistsView.getSelectedPlaylist());
@@ -84,19 +84,19 @@ class MainWindow{
 
     this.fillAllTracksView();
   }
-  
-  onErrorUpdatingModel(error){
-    logger.error('',error);
+
+  onErrorUpdatingModel(error) {
+    logger.error('', error);
   }
 
-  fillAllTracksView(){
+  fillAllTracksView() {
     this._allTracksView.showList(this._popularityAutoList);
   }
 
-  newPlaylist(){
+  newPlaylist() {
     let dialog = new TextInputDialog(this._screen, style);
     dialog.ask('New Playlist: enter name', '', (err, val) => {
-      if (err || val===undefined || val === null){
+      if (err || val === undefined || val === null) {
         return; //User pressed cancel/ESC
       }
 
@@ -105,17 +105,17 @@ class MainWindow{
     });
   }
 
-  _monkeyPatchScreen(){
+  _monkeyPatchScreen() {
     //monkey-add removeKeyAll
     let screen = this._screen;
-    screen.removeKeyAll = function(key) {
+    screen.removeKeyAll = function (key) {
       if (typeof key === 'string') key = key.split(/\s*,\s*/);
-      key.forEach((key)=>{
+      key.forEach((key) => {
         screen.removeAllListeners('key ' + key);
       });
     };
   }
-  
+
 }
 
 module.exports = MainWindow;

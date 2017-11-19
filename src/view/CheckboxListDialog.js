@@ -3,9 +3,9 @@
 var blessed = require('blessed');
 var ModalDialogBase = require('./ModalDialogBase.js');
 
-class CheckboxListDialog extends ModalDialogBase{
+class CheckboxListDialog extends ModalDialogBase {
 
-  constructor(screen, style, confirmKey){
+  constructor(screen, style, confirmKey) {
     super(screen, blessed.list({
       parent: screen,
       tags: true,
@@ -31,7 +31,7 @@ class CheckboxListDialog extends ModalDialogBase{
     }));
 
     this._box.search = (callback) => {
-      this._prompt.input('{white-fg}Search track:{/white-fg}', '', function(err, value) {
+      this._prompt.input('{white-fg}Search track:{/white-fg}', '', function (err, value) {
         if (err) return;
         return callback(null, value);
       });
@@ -60,29 +60,29 @@ class CheckboxListDialog extends ModalDialogBase{
     this._selected = undefined;
   }
 
-  ask(question, elements, selectedElements, callback){
+  ask(question, elements, selectedElements, callback) {
     this._elements = elements;
-    this._initalSelection = new Set(selectedElements); 
+    this._initalSelection = new Set(selectedElements);
     this._selected = new Set(selectedElements);
-    
-    this._box.setLabel(this._style.title.focused.replace('${title}',question));
+
+    this._box.setLabel(this._style.title.focused.replace('${title}', question));
     this._box.height = elements.length + 2;
     this._callback = callback;
-//    this._box.enterSelected(0);
+    //    this._box.enterSelected(0);
     this.show();
     this._update();
   }
 
-  _update(){
+  _update() {
     let checkboxStyle = this._style.checkbox;
 
-    let toString = function(checked, label){
+    let toString = function (checked, label) {
       return checkboxStyle
-        .replace('${checkbox}',checked ? 'x' : ' ')
+        .replace('${checkbox}', checked ? 'x' : ' ')
         .replace('${label}', label);
     };
 
-    let items = this._elements.map((val)=>{
+    let items = this._elements.map((val) => {
       return toString(this._selected.has(val), val);
     });
     this._box.setItems(items);
@@ -90,7 +90,7 @@ class CheckboxListDialog extends ModalDialogBase{
     this._screen.render();
   }
 
-  onShow(){
+  onShow() {
     super.onShow();
     this._screen.key('space', this.select.bind(this));
     this._screen.key(this._confirmKey, this.onDone.bind(this, true));
@@ -98,7 +98,7 @@ class CheckboxListDialog extends ModalDialogBase{
     this._screen.key('escape', this.onDone.bind(this, false));
   }
 
-  onHide(){
+  onHide() {
     this._screen.removeKeyAll('space');
     this._screen.removeKeyAll(this._confirmKey);
     this._screen.removeKeyAll('enter');
@@ -106,10 +106,10 @@ class CheckboxListDialog extends ModalDialogBase{
     super.onHide();
   }
 
-  select(){
+  select() {
     let idx = this._box.selected;
     let selectedElement = this._elements[idx];
-    if (this._selected.has(selectedElement)){
+    if (this._selected.has(selectedElement)) {
       this._selected.delete(selectedElement);
     } else {
       this._selected.add(selectedElement);
@@ -117,12 +117,12 @@ class CheckboxListDialog extends ModalDialogBase{
     this._update();
   }
 
-  onDone(passResult){
+  onDone(passResult) {
     let addedElements = [];
     let removedElements = [];
     let selectedElements = null;
 
-    if (passResult){
+    if (passResult) {
       addedElements = [...this._selected].filter(name => !this._initalSelection.has(name));
       removedElements = [...this._initalSelection].filter(name => !this._selected.has(name));
       selectedElements = [...this._selected];

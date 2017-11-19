@@ -1,53 +1,53 @@
 'use strict';
 
 const tagConfig = require('../util/TagConfig.js');
-class Track{
+class Track {
 
-  constructor(gmusicTrackObj){
+  constructor(gmusicTrackObj) {
     this._track = gmusicTrackObj;
     this._playlists = new Set();
     this._tags = new Set();
   }
 
-  getId(){
+  getId() {
     return this._track.id;
   }
 
-  getArtist(){
+  getArtist() {
     return this._track.artist;
   }
 
-  getTitle(){
+  getTitle() {
     return this._track.title;
   }
-  
-  getName(){
+
+  getName() {
     return this._track.artist + ' - ' + this._track.title;
   }
 
-  addPlaylistLocally(playlist){
+  addPlaylistLocally(playlist) {
     this._playlists.add(playlist);
   }
 
-  addTagLocally(tagPlaylist){
+  addTagLocally(tagPlaylist) {
     this._tags.add(tagPlaylist);
   }
 
-  clearPlaylistAndTagsLocally(){
+  clearPlaylistAndTagsLocally() {
     this._tags = new Set();
     this._playlists = new Set();
   }
 
-  tagsAsString(){
+  tagsAsString() {
     let tagsAsArray = [...this._tags];
-    return tagsAsArray.map((playlist)=>{
+    return tagsAsArray.map((playlist) => {
       return playlist.getName().replace(tagConfig.getPlaylistPrefix(), '');
     });
   }
 
-  isTaggedWith(tagName){
+  isTaggedWith(tagName) {
     for (let tag of this._tags) {
-      if (tag.getName() === tagName){
+      if (tag.getName() === tagName) {
         return true;
       }
     }
@@ -55,11 +55,11 @@ class Track{
     return false;
   }
 
-  getTags(){
+  getTags() {
     return this._tags;
   }
 
-  popularity(){
+  popularity() {
     return this._playlists.size;
   }
 }

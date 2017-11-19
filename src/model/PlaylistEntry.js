@@ -1,38 +1,38 @@
 'use strict';
 
-class PlaylistEntry{
+class PlaylistEntry {
 
-  constructor(pm, gmusicPlaylistEntry, track){
+  constructor(pm, gmusicPlaylistEntry, track) {
     this._pm = pm;
     this._gmusicPlaylistEntry = gmusicPlaylistEntry;
     this._track = track;
   }
 
-  getArtist(){
+  getArtist() {
     return this._track.getArtist();
   }
 
-  getTitle(){
+  getTitle() {
     return this._track.getTitle();
   }
 
-  getName(){
+  getName() {
     return this.getArtist() + ' - ' + this.getTitle();
   }
 
-  getTrack(){
+  getTrack() {
     return this._track;
   }
 
-  getClientId(){
+  getClientId() {
     return this._gmusicPlaylistEntry.clientId;
   }
 
-  getId(){
+  getId() {
     return this._gmusicPlaylistEntry.id;
   }
 
-  getAbsolutePosition(){
+  getAbsolutePosition() {
     return parseInt(this._gmusicPlaylistEntry.absolutePosition, 10);
   }
 

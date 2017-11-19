@@ -3,16 +3,16 @@
 var StreamPlayer = require('stream-player');
 const logger = require('../util/Logger.js');
 
-class Player{
+class Player {
 
-  constructor(playMusic){
+  constructor(playMusic) {
     this._playMusic = playMusic;
 
     this._streamPlayer = undefined;
     this._trackList = undefined;
   }
 
-  play(trackList, trackNr){
+  play(trackList, trackNr) {
     this.stop();
 
     this._streamPlayer = new StreamPlayer();
@@ -21,41 +21,41 @@ class Player{
     this._playTrackNr(trackNr);
   }
 
-  pause(){
-    if (this._streamPlayer){
+  pause() {
+    if (this._streamPlayer) {
       this._streamPlayer.pause();
     }
   }
 
-  resume(){
-    if (this._streamPlayer){
+  resume() {
+    if (this._streamPlayer) {
       this._streamPlayer.resume();
     }
   }
 
-  stop(){
-    if (this._streamPlayer){
+  stop() {
+    if (this._streamPlayer) {
       this._streamPlayer.pause();
       delete this._streamPlayer;
       delete this._trackList;
     }
   }
 
-  _getStreamUrl(track){
-    return new Promise((resolve,reject)=>{
-      this._playMusic.getStreamUrl(track.getId(), function(err, streamUrl) {
-        if (err){
+  _getStreamUrl(track) {
+    return new Promise((resolve, reject) => {
+      this._playMusic.getStreamUrl(track.getId(), function (err, streamUrl) {
+        if (err) {
           logger.warning('failed to play: ', err);
           return reject(err);
         }
-  
+
         resolve(streamUrl);
       });
     });
   }
 
-  _playTrackNr(idx){
-    if (!this._trackList || idx >= this._trackList.length){
+  _playTrackNr(idx) {
+    if (!this._trackList || idx >= this._trackList.length) {
       logger.info('no more tracks left to play');
       return;
     }
@@ -63,15 +63,15 @@ class Player{
     let track = this._trackList[idx];
 
     this._getStreamUrl(track)
-      .then((url)=>{
-        if (this._streamPlayer){
+      .then((url) => {
+        if (this._streamPlayer) {
           this._streamPlayer.removeAllListeners('io error');
           this._streamPlayer.removeAllListeners('play end');
 
-          this._streamPlayer.once('play end',()=>{
+          this._streamPlayer.once('play end', () => {
             logger.verbose('song ended -> playing next');
-            this._playTrackNr(idx+1);
-          }).once('io error', (err)=>{
+            this._playTrackNr(idx + 1);
+          }).once('io error', (err) => {
             logger.warning('streaming error (' + err + ') - stopped playing');
             this.stop();
           });

@@ -1,17 +1,17 @@
 'use strict';
 
-class PopularityAutoList{
+class PopularityAutoList {
 
-  constructor(allTracks){
+  constructor(allTracks) {
     this._tracks = allTracks;
   }
 
-  getName(){
+  getName() {
     return 'All Tracks [sorted by popularity]';
   }
 
-  getTracks(){
-    return this._tracks.asArray().sort((a,b)=>{
+  getTracks() {
+    return this._tracks.asArray().sort((a, b) => {
       return a.popularity() < b.popularity();
     });
   }

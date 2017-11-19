@@ -2,8 +2,8 @@
 
 var blessed = require('blessed');
 
-class OutputView{
-  constructor(screen, style){
+class OutputView {
+  constructor(screen, style) {
     this._screen = screen;
 
     this._list = blessed.list({
@@ -32,33 +32,33 @@ class OutputView{
     });
   }
 
-  gray(output){
+  gray(output) {
     this._list.addItem('{gray-fg}' + output + '{/gray-fg}');
     this._update();
   }
-  grey(output){
-    this._list.addItem('{grey-fg}' + output + '{/grey-fg}');    
+  grey(output) {
+    this._list.addItem('{grey-fg}' + output + '{/grey-fg}');
     this._update();
   }
-  green(output){
+  green(output) {
     this._list.addItem('{white-fg}' + output + '{/white-fg}');
     this._update();
   }
-  yellow(output){
+  yellow(output) {
     this._list.addItem('{yellow-fg}' + output + '{/yellow-fg}');
     this._update();
   }
-  red(output){
+  red(output) {
     this._list.addItem('{red-fg}' + output + '{/red-fg}');
     this._update();
   }
 
-  _update(){
+  _update() {
     this._list.scrollTo(this._list.items.length);
     this._screen.render();
   }
-  
-            
+
+
 }
 
 module.exports = OutputView;

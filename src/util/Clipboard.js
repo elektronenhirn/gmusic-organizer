@@ -1,28 +1,28 @@
 'use strict';
 
-class Clipboard{
-  
-  constructor(){
+class Clipboard {
+
+  constructor() {
     this._obj = undefined;
     this._action = undefined;
   }
 
-  content(){
+  content() {
     return this._obj;
   }
 
-  set(obj, action){
+  set(obj, action) {
     this._obj = obj;
     this._action = action;
   }
 
-  paste(model, referenceObj){
-    if (this._action){
+  paste(model, referenceObj) {
+    if (this._action) {
       this._action(this, model, referenceObj);
     }
   }
 
-  clear(){
+  clear() {
     this._obj = undefined;
     this._action = undefined;
   }

@@ -3,9 +3,9 @@
 var blessed = require('blessed');
 var ModalDialogBase = require('./ModalDialogBase.js');
 
-class TextInputDialog extends ModalDialogBase{
-  
-  constructor(screen, style){
+class TextInputDialog extends ModalDialogBase {
+
+  constructor(screen, style) {
     super(screen, blessed.prompt({
       parent: screen,
       top: 'center',
@@ -22,7 +22,7 @@ class TextInputDialog extends ModalDialogBase{
     }));
   }
 
-  ask(question, defaultReply, callback){
+  ask(question, defaultReply, callback) {
     this._box.input(question, defaultReply, callback);
   }
 }

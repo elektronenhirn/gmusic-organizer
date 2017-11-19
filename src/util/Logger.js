@@ -5,13 +5,13 @@ var path = require('path');
 const dotFolder = require('./DotFolder.js');
 const LOGFILE = path.join(dotFolder.get(), 'log.txt');
 
-class Logger{
+class Logger {
 
-  constructor(){
+  constructor() {
     this._outputView = undefined;
 
-    if (fs.existsSync(LOGFILE)){
-      fs.unlinkSync(LOGFILE);      
+    if (fs.existsSync(LOGFILE)) {
+      fs.unlinkSync(LOGFILE);
     }
 
     this.stderr = (chunk) => {
@@ -19,54 +19,54 @@ class Logger{
     };
   }
 
-  setView(outputView){
+  setView(outputView) {
     this._outputView = outputView;
   }
 
-  verbose(msg){
+  verbose(msg) {
     msg = this._getTime() + ' ' + msg;
-    if (global.verbose && this._outputView){
+    if (global.verbose && this._outputView) {
       this._outputView.grey(msg);
     }
     this.write('V ' + msg + '\n');
   }
 
-  debug(msg){
+  debug(msg) {
     msg = this._getTime() + ' ' + msg;
-    if (this._outputView){
+    if (this._outputView) {
       this._outputView.gray(msg);
     }
     this.write('D ' + msg + '\n');
   }
 
-  info(msg){
+  info(msg) {
     msg = this._getTime() + ' ' + msg;
-    if (this._outputView){
+    if (this._outputView) {
       this._outputView.green(msg);
     }
     this.write('I ' + msg + '\n');
   }
 
-  warning(msg){
+  warning(msg) {
     msg = this._getTime() + ' ' + msg;
-    if (this._outputView){
+    if (this._outputView) {
       this._outputView.yellow(msg);
     }
     this.write('W ' + msg + '\n');
   }
 
-  error(msg, error){
+  error(msg, error) {
     msg = this._getTime() + ' ' + msg + (error || '');
-    if (this._outputView){
+    if (this._outputView) {
       this._outputView.red(msg);
     }
     this.write('E ' + msg + '\n');
-    if (error && error.stack){
+    if (error && error.stack) {
       this.write('E ' + error.stack + '\n');
     }
   }
 
-  write(str){
+  write(str) {
     fs.appendFileSync(LOGFILE, str);
   }
 
@@ -90,7 +90,7 @@ class Logger{
       millis = '0' + millis;
     }
     return hours + ':' + minutes + ':' + seconds + '.' + millis;
-  } 
+  }
 
 }
 
