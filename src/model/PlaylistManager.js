@@ -43,19 +43,42 @@ class PlaylistManager extends EventEmitter {
 
         this._gmusicPlaylists = data.data.items;
 
-        this._pm.getPlayListEntries((err, library) => {
-          if (err) {
-            this.emit('error', new Error('failed to fetch playlists entries from gmusic', err));
-            return resolve();
-          }
-
-          this._gmusicPlaylistsEntries = library.data.items;
+        this._doFetchPlaylistEntries().then((entries) => {
+          this._gmusicPlaylistsEntries = entries;
+          logger.debug('received ' + this._gmusicPlaylistsEntries.length + ' playlist entries');
           this._populatePlaylists();
           this.emit('updated');
           resolve();
         });
       });
     });
+  }
+
+  _doFetchPlaylistEntries(resolvePromise = null, entries = [], nextPageToken = null) {
+    let promise = null;
+
+    if (!resolvePromise) {
+      promise = new Promise((resolve) => {
+        resolvePromise = resolve;
+      });
+    }
+
+    this._pm.getPlayListEntries({ nextPageToken: nextPageToken }, (err, library) => {
+      if (err) {
+        this.emit('error', new Error('failed to fetch playlists entries from gmusic', err));
+        resolvePromise();
+      }
+
+      entries.push(...library.data.items);
+
+      if (library.nextPageToken) {
+        this._doFetchPlaylistEntries(resolvePromise, entries, library.nextPageToken);
+      } else {
+        resolvePromise(entries);
+      }
+    });
+
+    return promise;
   }
 
   newPlaylist(name) {
