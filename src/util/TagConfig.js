@@ -4,8 +4,8 @@ const dotFolder = require('./DotFolder.js');
 const tagsFile = require('user-settings').file('.gmusic-organizer/tags');
 
 const DEFAULT_TAGS = {
-  lang: ['en', 'de', 'fr', 'it'],
-  genre: ['electro', 'pop', 'indie', 'folk', 'schlager', 'hiphop']
+  lang: ['en', 'de', 'fr', 'it', 'other'],
+  genre: ['electro', 'rock', 'pop', 'indie', 'folk', 'schlager', 'hiphop', 'soul', 'reggae', 'other']
 };
 const DEFAULT_PLAYLIST_PREFIX = 'zz [tag] ';
 
@@ -26,7 +26,7 @@ class TagConfig {
     return tags;
   }
 
-  getQualifiedTag(categoryIdx, tagIdx){
+  getQualifiedTag(categoryIdx, tagIdx) {
     let category = Object.keys(this._tags)[categoryIdx];
     return category + ':' + this._tags[category][tagIdx];
   }
