@@ -59,6 +59,7 @@ Playlist management
  
  n             create new playlist 
  del/backspace delete playlist
+ d             download playlist to disk (into ~/gmusic)
 
 Playlist manipulation
  

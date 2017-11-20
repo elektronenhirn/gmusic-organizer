@@ -2,8 +2,10 @@
 
 const logger = require('../util/Logger.js');
 const https = require('follow-redirects').https;
+const http = require('follow-redirects').http;
 const fs = require('fs');
 const path = require('path');
+const NodeID3 = require('node-id3');
 
 class Downloader {
 
@@ -47,29 +49,43 @@ class Downloader {
   }
 
   downloadPlaylist(playlist){
-    if (!fs.existsSync(this._downloadFolder)){
-      fs.mkdirSync(this._downloadFolder);
-    }
+    logger.info('downloading playlist ' + playlist.getName());
 
-    let playlistFolder = path.join(this._downloadFolder,playlist.getName());
-    if (!fs.existsSync(playlistFolder)){
-      fs.mkdirSync(playlistFolder);
-    }
-
-    this._downloadNextPlaylistEntry(playlist, 0, playlistFolder);
+    return new Promise((resolve)=>{
+      if (!fs.existsSync(this._downloadFolder)){
+        fs.mkdirSync(this._downloadFolder);
+      }
+  
+      let playlistFolder = path.join(this._downloadFolder,playlist.getName());
+      if (!fs.existsSync(playlistFolder)){
+        fs.mkdirSync(playlistFolder);
+      }
+  
+      this._downloadNextPlaylistEntry(playlist, 0, playlistFolder, resolve);  
+    });
   }
 
-  _downloadNextPlaylistEntry(playlist, idx, playlistFolder){
+  _downloadNextPlaylistEntry(playlist, idx, playlistFolder, resolve){
     if (idx >= playlist.getLength()){
+      logger.info('downloading playlist ' + playlist.getName() + ' done');
+      resolve();
       return; //done
     }
     
     let track = playlist.getEntryAt(idx).getTrack();
-    let idxAsStr = this.padTo3(idx + 1);
+    let idxAsStr = this._padTo3(idx + 1);
     let filePath = path.join(playlistFolder, idxAsStr + ' ' + track.getName() + '.mp3');
     
+    if (fs.existsSync(filePath)){
+      logger.debug('skipping downloading of ' + track.getName() + ' - already up-to-date');
+      this._downloadNextPlaylistEntry(playlist, idx+1, playlistFolder, resolve);      
+      return;
+    }
+
     this.downloadTrack(track, filePath).then(()=>{
-      this._downloadNextPlaylistEntry(playlist, idx+1, playlistFolder);
+      return this._embeddId3Tags(track, filePath);
+    }).then(()=>{
+      this._downloadNextPlaylistEntry(playlist, idx+1, playlistFolder, resolve);      
     });
   }
 
@@ -86,7 +102,45 @@ class Downloader {
     });
   }
 
-  padTo3(number) {
+  _embeddId3Tags(track, filePath){
+
+    return this._downloadArtistArt(track, filePath).then((imageBuffer)=>{
+      let tags = {
+        title: track._track.title,
+        artist: track._track.artist,
+        album: track._track.album,
+        year: track._track.year,
+        genre: track._track.genre,
+        image: imageBuffer
+      };
+  
+      NodeID3.write(tags, filePath);  
+    });
+  }
+
+  _downloadArtistArt(track){
+    if (!track._track.artistArtRef[0] || !track._track.artistArtRef[0].url){
+      return Promise.resolve(null);
+    }
+
+    return new Promise((resolve)=>{
+      let url = track._track.artistArtRef[0].url;
+
+      logger.debug('downloading artist\'s photo for ' + track.getName());
+      http.get(url, function(response) {
+        let data = [];
+        response.on('data',(chunk)=>{
+          data.push(chunk);
+        });
+        response.on('end', ()=>{
+          logger.debug('downloading artist\'s photo for ' + track.getName() + ' done');
+          resolve(Buffer.concat(data));
+        });
+      });
+    });
+  }
+
+  _padTo3(number) {
     if (number<=999) { 
       number = ('00' + number).slice(-3); 
     }

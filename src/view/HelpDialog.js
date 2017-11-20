@@ -21,6 +21,7 @@ const CONTENT =
   '\nPlaylist management\n\n' +
   ' n             create new playlist\n' +
   ' del/backspace delete playlist\n' +
+  ' d             download playlist\n' +
 
   '\nPlaylist manipulation\n\n' +
   ' C-c           copy song to clipboard\n' +
