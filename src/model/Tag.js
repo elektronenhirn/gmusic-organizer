@@ -1,7 +1,7 @@
 'use strict';
 
 const Playlist = require('./Playlist.js');
-const tagConfig = require('../util/Tagconfig.js');
+const tagConfig = require('../util/TagConfig.js');
 
 class Tag extends Playlist {
 
